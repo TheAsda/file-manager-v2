@@ -1,7 +1,14 @@
+import { useMemo } from 'react';
+
 export const useKeyMap = () => {
-  return {
-    up: 'up',
-    down: 'down',
-    openCommandPalette: 'ctrl+shift+p',
-  };
+  const data = useMemo(
+    () => ({
+      up: 'up',
+      down: 'down',
+      openCommandPalette: 'ctrl+shift+p',
+    }),
+    []
+  );
+
+  return data;
 };
