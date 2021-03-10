@@ -10,6 +10,7 @@ import { ExplorerHeader } from './explorer-header';
 
 export interface ExplorerProps {
   data: FileInfo[];
+  selected: number;
 }
 
 export const Explorer = (props: ExplorerProps) => {
@@ -18,7 +19,6 @@ export const Explorer = (props: ExplorerProps) => {
   }
 
   const [ref, { width }] = useMeasure<HTMLDivElement>();
-
   const columns = useColumns();
 
   const [columnsSizes, setColumnsSizes] = useState(
@@ -51,12 +51,13 @@ export const Explorer = (props: ExplorerProps) => {
   return (
     <div className={styles.explorer} ref={ref}>
       <ExplorerHeader columns={columns} sizes={columnsSizes} />
-      {props.data.map((item) => (
+      {props.data.map((item, i) => (
         <ExplorerRow
           sizes={columnsSizes}
           key={item.name}
           data={item}
           columns={columns}
+          selected={i === props.selected}
         />
       ))}
     </div>

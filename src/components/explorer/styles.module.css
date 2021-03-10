@@ -15,6 +15,7 @@
 }
 
 .explorer__row--selected {
+  background-color: gray;
 }
 
 .explorer__cell {

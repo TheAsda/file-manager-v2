@@ -1,4 +1,5 @@
 import React from 'react';
+import cx from 'classnames';
 import { FileInfo } from '../../types/file-info';
 import { ExplorerCell } from './explorer-cell';
 import { Column } from './useColumns';
@@ -8,6 +9,7 @@ export interface ExplorerRowProps {
   columns: Column<FileInfo>[];
   data: FileInfo;
   sizes: number[];
+  selected?: boolean;
 }
 
 export const ExplorerRow = (props: ExplorerRowProps) => {
@@ -17,7 +19,10 @@ export const ExplorerRow = (props: ExplorerRowProps) => {
 
   return (
     <div
-      className={styles.explorer__row}
+      className={cx(
+        styles.explorer__row,
+        props.selected && styles['explorer__row--selected']
+      )}
       style={{
         gridTemplateColumns: props.sizes.map((item) => `${item}px`).join(' '),
       }}

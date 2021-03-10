@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useEffect } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
 import { Modal } from 'react-responsive-modal';
 import { useKeyMap } from '../../hooks/useKeyMap';
+import { useSelected } from '../../hooks/useSelected';
 import { SelectPaletteItem } from './select-palette-item';
 
 export interface SelectPaletteProps {
@@ -14,10 +15,15 @@ export interface SelectPaletteProps {
 
 export const SelectPalette = (props: SelectPaletteProps) => {
   const { up, down } = useKeyMap();
-  const [selected, setSelected] = useState(0);
+  const [selected, dispatch] = useSelected(props.options.length);
 
-  useHotkeys(down, () => setSelected((s) => s + 1));
-  useHotkeys(up, () => setSelected((s) => s - 1));
+  useHotkeys(down, () => dispatch('increase'));
+  useHotkeys(up, () => dispatch('decrease'));
+
+  useEffect(() => {
+    dispatch('reset');
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [props.options]);
 
   return (
     <Modal

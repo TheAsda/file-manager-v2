@@ -1,5 +1,6 @@
 import { log } from 'electron-log';
-import React from 'react';
+import React, { useState } from 'react';
+import { useHotkeys } from 'react-hotkeys-hook';
 import { ReflexContainer, ReflexElement, ReflexSplitter } from 'react-reflex';
 import { isDev } from '../../config';
 import { Panel } from '../panel/panel';
@@ -10,14 +11,18 @@ export const Panels = () => {
     log('Panels rendered');
   }
 
+  const [focused, setFocused] = useState<'left' | 'right'>('left');
+
+  useHotkeys('tab', () => setFocused((s) => (s === 'left' ? 'right' : 'left')));
+
   return (
     <ReflexContainer orientation="vertical" className={styles.panels}>
       <ReflexElement>
-        <Panel />
+        <Panel isFocused={focused === 'left'} />
       </ReflexElement>
       <ReflexSplitter />
       <ReflexElement>
-        <Panel />
+        <Panel isFocused={focused === 'right'} />
       </ReflexElement>
     </ReflexContainer>
   );

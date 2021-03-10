@@ -1,16 +1,29 @@
 import dayjs from 'dayjs';
 import { log } from 'electron-log';
 import React from 'react';
+import { useHotkeys } from 'react-hotkeys-hook';
 import { isDev } from '../../config';
+import { useKeyMap } from '../../hooks/useKeyMap';
+import { useSelected } from '../../hooks/useSelected';
 import { Explorer } from '../explorer/explorer';
 
-export const Panel = () => {
+export interface PanelProps {
+  isFocused: boolean;
+}
+
+export const Panel = ({ isFocused }: PanelProps) => {
   if (isDev) {
-    log('Panel rendered');
+    log(`Panel rendered`);
   }
 
+  const { up, down } = useKeyMap();
+  const [selected, dispatch] = useSelected(2);
+
+  useHotkeys(down, () => isFocused && dispatch('increase'), [isFocused]);
+  useHotkeys(up, () => isFocused && dispatch('decrease'), [isFocused]);
+
   return (
-    <div>
+    <div style={{ backgroundColor: isFocused ? 'green' : undefined }}>
       <Explorer
         data={[
           {
@@ -30,6 +43,7 @@ export const Panel = () => {
             size: 0,
           },
         ]}
+        selected={selected}
       />
     </div>
   );
