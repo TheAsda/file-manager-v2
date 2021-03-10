@@ -1,0 +1,31 @@
+.explorer {
+  width: 100%;
+}
+
+.explorer__header {
+  display: grid;
+}
+
+.explorer__header-cell {
+  font-weight: bold;
+}
+
+.explorer__row {
+  display: grid;
+}
+
+.explorer__row--selected {
+}
+
+.explorer__cell {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.explorer__resizer {
+  background-color: black;
+  cursor: col-resize;
+  width: 2px;
+  height: 100%;
+}

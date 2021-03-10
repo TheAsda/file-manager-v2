@@ -6,9 +6,12 @@ import { isHiddenSync } from 'hidefile';
 import { log } from 'electron-log';
 import { FileInfo } from '../types/file-info';
 
+const chunkSize = 5;
+
 export const useDirectory = (directory: string): FileInfo[] => {
   const [state, setState] = useState<FileInfo[]>([]);
   const [finished, setFinished] = useState(true);
+  const [prevDir, setPrevDir] = useState('');
 
   const getFileInfo = async (item: FileInfo): Promise<FileInfo> => {
     const data = await stat(item.path);
@@ -28,36 +31,48 @@ export const useDirectory = (directory: string): FileInfo[] => {
   };
 
   useEffect(() => {
-    readdir(directory, (err, files) => {
-      if (err) {
-        log(err);
-        setState([]);
-        return;
-      }
+    if (prevDir !== directory) {
+      setPrevDir(directory);
+      readdir(directory, (err, files) => {
+        if (err) {
+          log(err);
+          setState([]);
+          return;
+        }
 
-      setState(
-        files.map((item) => ({
-          name: item,
-          path: join(directory, item),
-        }))
-      );
-      setFinished(false);
-    });
-  }, [directory]);
+        setState(
+          files.map((item) => ({
+            name: item,
+            path: join(directory, item),
+          }))
+        );
+        setFinished(false);
+      });
+    }
+  }, [directory, prevDir]);
 
   useEffect(() => {
     if (finished) {
       return;
     }
 
-    state.forEach(async (item, i) => {
+    let chunk: FileInfo[] = [];
+
+    state.forEach(async (item, i, arr) => {
       const newItem = await getFileInfo(item);
 
-      setState((s) => {
-        s[i] = newItem;
+      if (chunk.length < chunkSize && i !== arr.length - 1) {
+        chunk[i] = newItem;
+      } else {
+        setState((s) => {
+          Object.entries(chunk).forEach(([index, value]) => {
+            s[+index] = value;
+          });
 
-        return [...s];
-      });
+          return [...s];
+        });
+        chunk = [];
+      }
     });
   }, [finished, state]);
 
