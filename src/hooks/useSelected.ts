@@ -1,3 +1,4 @@
+import { log } from 'electron-log';
 import { useCallback, useEffect, useReducer } from 'react';
 
 export type ActionType = 'increase' | 'decrease' | 'reset';
@@ -31,12 +32,12 @@ const reducer = (state: State, type: ActionType | { max: number }): State => {
         selected: 0,
       };
     default:
-      if (!type.max) {
+      if (typeof type.max !== 'number') {
         throw new Error('Unknown type');
       }
       return {
         selected: 0,
-        max: state.max,
+        max: type.max,
       };
   }
 };
@@ -53,7 +54,5 @@ export const useSelected = (max: number) => {
     }
   }, [max, state.max]);
 
-  const act = useCallback((type: ActionType) => dispatch(type), []);
-
-  return [state.selected, act] as const;
+  return [state.selected, dispatch as (type: ActionType) => void] as const;
 };

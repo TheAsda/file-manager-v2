@@ -1,8 +1,9 @@
 import dayjs from 'dayjs';
 import { log } from 'electron-log';
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
 import { isDev } from '../../config';
+import { useDirectory } from '../../hooks/useDirectory';
 import { useKeyMap } from '../../hooks/useKeyMap';
 import { useSelected } from '../../hooks/useSelected';
 import { Explorer } from '../explorer/explorer';
@@ -16,35 +17,18 @@ export const Panel = ({ isFocused }: PanelProps) => {
     log(`Panel rendered`);
   }
 
+  const path = useMemo(() => process.cwd(), []);
+
   const { up, down } = useKeyMap();
-  const [selected, dispatch] = useSelected(2);
+  const data = useDirectory(path);
+  const [selected, dispatch] = useSelected(data.length);
 
   useHotkeys(down, () => isFocused && dispatch('increase'), [isFocused]);
   useHotkeys(up, () => isFocused && dispatch('decrease'), [isFocused]);
 
   return (
     <div>
-      <Explorer
-        data={[
-          {
-            name: 'file.txt',
-            path: 'C:\\file.txt',
-            created: dayjs(),
-            lastModified: dayjs(),
-            isDirectory: false,
-            size: 123,
-          },
-          {
-            name: 'folder',
-            path: 'C:\\folder',
-            created: dayjs(),
-            lastModified: dayjs(),
-            isDirectory: true,
-            size: 0,
-          },
-        ]}
-        selected={isFocused ? selected : null}
-      />
+      <Explorer data={data} selected={isFocused ? selected : null} />
     </div>
   );
 };
