@@ -10,7 +10,7 @@ import { ExplorerHeader } from './explorer-header';
 
 export interface ExplorerProps {
   data: FileInfo[];
-  selected: number;
+  selected: number | null;
 }
 
 export const Explorer = (props: ExplorerProps) => {

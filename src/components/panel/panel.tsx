@@ -23,7 +23,7 @@ export const Panel = ({ isFocused }: PanelProps) => {
   useHotkeys(up, () => isFocused && dispatch('decrease'), [isFocused]);
 
   return (
-    <div style={{ backgroundColor: isFocused ? 'green' : undefined }}>
+    <div>
       <Explorer
         data={[
           {
@@ -43,7 +43,7 @@ export const Panel = ({ isFocused }: PanelProps) => {
             size: 0,
           },
         ]}
-        selected={selected}
+        selected={isFocused ? selected : null}
       />
     </div>
   );
