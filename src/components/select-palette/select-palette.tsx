@@ -17,11 +17,11 @@ export const SelectPalette = (props: SelectPaletteProps) => {
   const { up, down } = useKeyMap();
   const [selected, dispatch] = useSelected(props.options.length);
 
-  useHotkeys(down, () => dispatch('increase'));
-  useHotkeys(up, () => dispatch('decrease'));
+  useHotkeys(down, () => dispatch({ type: 'increase' }));
+  useHotkeys(up, () => dispatch({ type: 'decrease' }));
 
   useEffect(() => {
-    dispatch('reset');
+    dispatch({ type: 'reset' });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [props.options]);
 

@@ -22,12 +22,20 @@ export const Panel = ({ isFocused }: PanelProps) => {
   const data = useDirectory(path);
   const [selected, dispatch] = useSelected(data.length);
 
-  useHotkeys(down, () => isFocused && dispatch('increase'), [isFocused]);
-  useHotkeys(up, () => isFocused && dispatch('decrease'), [isFocused]);
+  useHotkeys(down, () => isFocused && dispatch({ type: 'increase' }), [
+    isFocused,
+  ]);
+  useHotkeys(up, () => isFocused && dispatch({ type: 'decrease' }), [
+    isFocused,
+  ]);
 
   return (
     <div>
-      <Explorer data={data} selected={isFocused ? selected : null} />
+      <Explorer
+        data={data}
+        selected={isFocused ? selected : null}
+        onSelect={(index) => dispatch({ type: 'select', index })}
+      />
     </div>
   );
 };

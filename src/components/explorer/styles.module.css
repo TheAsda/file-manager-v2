@@ -14,6 +14,10 @@
   display: grid;
 }
 
+.explorer__row:hover {
+  background-color: darkgray;
+}
+
 .explorer__row--selected {
   background-color: gray;
 }

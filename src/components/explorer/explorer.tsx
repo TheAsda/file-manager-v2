@@ -11,6 +11,7 @@ import { ExplorerHeader } from './explorer-header';
 export interface ExplorerProps {
   data: FileInfo[];
   selected: number | null;
+  onSelect: (index: number) => void;
 }
 
 export const Explorer = (props: ExplorerProps) => {
@@ -46,8 +47,6 @@ export const Explorer = (props: ExplorerProps) => {
     setColumnsSizes(newColumnSizes);
   }, [width, columnsSizes, columns.length]);
 
-  log(columnsSizes);
-
   return (
     <div className={styles.explorer} ref={ref}>
       <ExplorerHeader columns={columns} sizes={columnsSizes} />
@@ -58,6 +57,8 @@ export const Explorer = (props: ExplorerProps) => {
           data={item}
           columns={columns}
           selected={i === props.selected}
+          onSelect={() => props.onSelect(i)}
+          onActivate={() => console.log(i)}
         />
       ))}
     </div>

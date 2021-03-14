@@ -1,14 +1,32 @@
+import { error, warn } from 'electron-log';
 import { useEffect, useReducer } from 'react';
 
-export type ActionType = 'increase' | 'decrease' | 'reset';
+export type SelectedActions =
+  | {
+      type: 'increase';
+    }
+  | {
+      type: 'decrease';
+    }
+  | {
+      type: 'reset';
+    }
+  | {
+      type: 'set-max';
+      max: number;
+    }
+  | {
+      type: 'select';
+      index: number;
+    };
 
 interface State {
   max: number;
   selected: number;
 }
 
-const reducer = (state: State, type: ActionType | { max: number }): State => {
-  switch (type) {
+const reducer = (state: State, action: SelectedActions): State => {
+  switch (action.type) {
     case 'increase':
       if (state.selected < state.max - 1) {
         return {
@@ -30,14 +48,22 @@ const reducer = (state: State, type: ActionType | { max: number }): State => {
         max: state.max,
         selected: 0,
       };
-    default:
-      if (typeof type.max !== 'number') {
-        throw new Error('Unknown type');
-      }
+    case 'set-max':
       return {
         selected: 0,
-        max: type.max,
+        max: action.max,
       };
+    case 'select':
+      if (action.index < state.max - 1 && action.index > 0) {
+        return {
+          max: state.max,
+          selected: action.index,
+        };
+      }
+      error('Index out of bound');
+      return state;
+    default:
+      throw new Error('Unknown action type');
   }
 };
 
@@ -49,9 +75,9 @@ export const useSelected = (max: number) => {
 
   useEffect(() => {
     if (max !== state.max) {
-      dispatch({ max });
+      dispatch({ type: 'set-max', max });
     }
   }, [max, state.max]);
 
-  return [state.selected, dispatch as (type: ActionType) => void] as const;
+  return [state.selected, dispatch] as const;
 };

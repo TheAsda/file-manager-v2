@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import cx from 'classnames';
 import { FileInfo } from '../../types/file-info';
 import { ExplorerCell } from './explorer-cell';
@@ -10,6 +10,8 @@ export interface ExplorerRowProps {
   data: FileInfo;
   sizes: number[];
   selected?: boolean;
+  onSelect: () => void;
+  onActivate: () => void;
 }
 
 export const ExplorerRow = (props: ExplorerRowProps) => {
@@ -17,15 +19,31 @@ export const ExplorerRow = (props: ExplorerRowProps) => {
     throw new Error('Sizes count are not equal to columns count');
   }
 
+  const ref = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (props.selected) {
+      ref.current?.focus();
+    }
+  }, [props.selected]);
+
   return (
     <div
       className={cx(
-        styles.explorer__row,
-        props.selected && styles['explorer__row--selected']
+        styles.explorer__row
+        // props.selected && styles['explorer__row--selected']
       )}
       style={{
         gridTemplateColumns: props.sizes.map((item) => `${item}px`).join(' '),
       }}
+      role="option"
+      aria-selected={props.selected}
+      tabIndex={0}
+      onClick={props.onSelect}
+      onKeyPress={props.onActivate}
+      onKeyDownCapture={(e) => e.key === 'Tab' && e.preventDefault()}
+      onDoubleClick={props.onActivate}
+      ref={ref}
     >
       {props.columns.map((col) => (
         <ExplorerCell key={col.header}>
