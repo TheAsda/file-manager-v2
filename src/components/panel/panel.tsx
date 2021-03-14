@@ -1,4 +1,3 @@
-import dayjs from 'dayjs';
 import { log } from 'electron-log';
 import React, { useMemo } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';

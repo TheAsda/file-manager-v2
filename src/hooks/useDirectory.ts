@@ -1,7 +1,7 @@
 import dayjs from 'dayjs';
 import { readdir, stat } from 'fs-extra';
 import { join } from 'path';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { isHiddenSync } from 'hidefile';
 import { log } from 'electron-log';
 import { FileInfo } from '../types/file-info';
@@ -11,7 +11,7 @@ const chunkSize = 5;
 export const useDirectory = (directory: string): FileInfo[] => {
   const [state, setState] = useState<FileInfo[]>([]);
   const [finished, setFinished] = useState(true);
-  const [prevDir, setPrevDir] = useState('');
+  const prevDir = useRef('');
 
   const getFileInfo = async (item: FileInfo): Promise<FileInfo> => {
     const data = await stat(item.path);
@@ -31,8 +31,8 @@ export const useDirectory = (directory: string): FileInfo[] => {
   };
 
   useEffect(() => {
-    if (prevDir !== directory) {
-      setPrevDir(directory);
+    if (prevDir.current !== directory) {
+      prevDir.current = directory;
       readdir(directory, (err, files) => {
         if (err) {
           log(err);
@@ -58,22 +58,26 @@ export const useDirectory = (directory: string): FileInfo[] => {
 
     let chunk: FileInfo[] = [];
 
-    state.forEach(async (item, i, arr) => {
-      const newItem = await getFileInfo(item);
+    Promise.all(
+      state.map(async (item, i, arr) => {
+        const newItem = await getFileInfo(item);
 
-      if (chunk.length < chunkSize && i !== arr.length - 1) {
-        chunk[i] = newItem;
-      } else {
-        setState((s) => {
-          Object.entries(chunk).forEach(([index, value]) => {
-            s[+index] = value;
+        if (chunk.length < chunkSize && i !== arr.length - 1) {
+          chunk[i] = newItem;
+        } else {
+          setState((s) => {
+            Object.entries(chunk).forEach(([index, value]) => {
+              s[+index] = value;
+            });
+
+            return [...s];
           });
-
-          return [...s];
-        });
-        chunk = [];
-      }
-    });
+          chunk = [];
+        }
+      })
+    )
+      .then(() => setFinished(true))
+      .catch((err) => log(err));
   }, [finished, state]);
 
   return state;

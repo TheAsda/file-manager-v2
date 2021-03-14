@@ -1,5 +1,4 @@
-import { log } from 'electron-log';
-import { useCallback, useEffect, useReducer } from 'react';
+import { useEffect, useReducer } from 'react';
 
 export type ActionType = 'increase' | 'decrease' | 'reset';
 
