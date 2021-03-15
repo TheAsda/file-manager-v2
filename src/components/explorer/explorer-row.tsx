@@ -28,6 +28,7 @@ export const ExplorerRow = (props: ExplorerRowProps) => {
   }, [props.selected]);
 
   return (
+    // eslint-disable-next-line jsx-a11y/click-events-have-key-events
     <div
       className={cx(
         styles.explorer__row
@@ -40,8 +41,6 @@ export const ExplorerRow = (props: ExplorerRowProps) => {
       aria-selected={props.selected}
       tabIndex={0}
       onClick={props.onSelect}
-      onKeyPress={props.onActivate}
-      onKeyDownCapture={(e) => e.key === 'Tab' && e.preventDefault()}
       onDoubleClick={props.onActivate}
       ref={ref}
     >

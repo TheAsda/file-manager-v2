@@ -3,10 +3,8 @@ import { readdir, stat } from 'fs-extra';
 import { join } from 'path';
 import { useEffect, useRef, useState } from 'react';
 import { isHiddenSync } from 'hidefile';
-import { log } from 'electron-log';
+import { error, log } from 'electron-log';
 import { FileInfo } from '../types/file-info';
-
-const chunkSize = 5;
 
 export const useDirectory = (directory: string): FileInfo[] => {
   const [state, setState] = useState<FileInfo[]>([]);
@@ -56,28 +54,24 @@ export const useDirectory = (directory: string): FileInfo[] => {
       return;
     }
 
-    let chunk: FileInfo[] = [];
+    const getInfo = async () => {
+      const chunk: Promise<FileInfo>[] = [];
 
-    Promise.all(
-      state.map(async (item, i, arr) => {
-        const newItem = await getFileInfo(item);
+      // eslint-disable-next-line no-restricted-syntax
+      for (const item of state) {
+        const newItem = getFileInfo(item);
 
-        if (chunk.length < chunkSize && i !== arr.length - 1) {
-          chunk[i] = newItem;
-        } else {
-          setState((s) => {
-            Object.entries(chunk).forEach(([index, value]) => {
-              s[+index] = value;
-            });
+        chunk.push(newItem);
+      }
 
-            return [...s];
-          });
-          chunk = [];
-        }
-      })
-    )
+      Promise.all(chunk)
+        .then((data) => setState(data))
+        .catch(error);
+    };
+
+    getInfo()
       .then(() => setFinished(true))
-      .catch((err) => log(err));
+      .catch(error);
   }, [finished, state]);
 
   return state;

@@ -1,4 +1,4 @@
-import { error, warn } from 'electron-log';
+import { error } from 'electron-log';
 import { useEffect, useReducer } from 'react';
 
 export type SelectedActions =

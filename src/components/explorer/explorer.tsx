@@ -12,6 +12,7 @@ export interface ExplorerProps {
   data: FileInfo[];
   selected: number | null;
   onSelect: (index: number) => void;
+  onActivate: (index: number) => void;
 }
 
 export const Explorer = (props: ExplorerProps) => {
@@ -58,7 +59,7 @@ export const Explorer = (props: ExplorerProps) => {
           columns={columns}
           selected={i === props.selected}
           onSelect={() => props.onSelect(i)}
-          onActivate={() => console.log(i)}
+          onActivate={() => props.onActivate(i)}
         />
       ))}
     </div>
