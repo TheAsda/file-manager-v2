@@ -1,5 +1,4 @@
 import React, { useEffect, useRef } from 'react';
-import cx from 'classnames';
 import { FileInfo } from '../../types/file-info';
 import { ExplorerCell } from './explorer-cell';
 import { Column } from './useColumns';
@@ -30,10 +29,7 @@ export const ExplorerRow = (props: ExplorerRowProps) => {
   return (
     // eslint-disable-next-line jsx-a11y/click-events-have-key-events
     <div
-      className={cx(
-        styles.explorer__row
-        // props.selected && styles['explorer__row--selected']
-      )}
+      className={styles.explorer__row}
       style={{
         gridTemplateColumns: props.sizes.map((item) => `${item}px`).join(' '),
       }}

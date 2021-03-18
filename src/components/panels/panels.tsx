@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
 import { ReflexContainer, ReflexElement, ReflexSplitter } from 'react-reflex';
 import { isDev } from '../../config';
+import { useFocus, useFocusAction } from '../../hooks/useFocus';
 import { useKeyMap } from '../../hooks/useKeyMap';
 import { Panel } from '../panel/panel';
 import styles from './styles.module.css';
@@ -13,20 +14,30 @@ export const Panels = () => {
   }
 
   const { switchPanel } = useKeyMap();
-  const [focused, setFocused] = useState<'left' | 'right'>('left');
+  const focus = useFocus();
+  const focusAction = useFocusAction();
 
   useHotkeys(switchPanel, () =>
-    setFocused((s) => (s === 'left' ? 'right' : 'left'))
+    focusAction((s) => {
+      switch (s) {
+        case 'left-panel':
+          return 'right-panel';
+        case 'right-panel':
+          return 'left-panel';
+        default:
+          return s;
+      }
+    })
   );
 
   return (
     <ReflexContainer orientation="vertical" className={styles.panels}>
       <ReflexElement>
-        <Panel isFocused={focused === 'left'} />
+        <Panel isFocused={focus === 'left-panel'} />
       </ReflexElement>
       <ReflexSplitter />
       <ReflexElement>
-        <Panel isFocused={focused === 'right'} />
+        <Panel isFocused={focus === 'right-panel'} />
       </ReflexElement>
     </ReflexContainer>
   );

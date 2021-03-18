@@ -61,7 +61,10 @@ export const CommandsProvider = ({ children }: PropsWithChildren<unknown>) => {
   );
 };
 
-export const useRegisterCommands = (key: string, commands: Command[]) => {
+export const useRegisterCommands = (
+  key: string | null,
+  commands: Command[]
+) => {
   const dispatch = useContext(CommandsDispatchContext);
 
   if (dispatch === undefined) {
@@ -69,6 +72,9 @@ export const useRegisterCommands = (key: string, commands: Command[]) => {
   }
 
   useEffect(() => {
+    if (key === null) {
+      return () => null;
+    }
     dispatch({ type: 'register', key, commands });
     return () => {
       dispatch({ type: 'unregister', key });

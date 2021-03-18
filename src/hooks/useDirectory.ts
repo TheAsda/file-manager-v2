@@ -57,10 +57,8 @@ export const useDirectory = (directory: string): FileInfo[] => {
     const getInfo = async () => {
       const chunk: Promise<FileInfo>[] = [];
 
-      // eslint-disable-next-line no-restricted-syntax
-      for (const item of state) {
-        const newItem = getFileInfo(item);
-
+      for (let i = 0; i < state.length; i++) {
+        const newItem = getFileInfo(state[i]);
         chunk.push(newItem);
       }
 

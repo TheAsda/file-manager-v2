@@ -34,3 +34,10 @@
   width: 2px;
   height: 100%;
 }
+
+.explorer__input {
+  width: 100%;
+}
+
+.explorer__editable-row {
+}

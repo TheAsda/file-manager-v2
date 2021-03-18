@@ -6,6 +6,8 @@ module.exports = {
     'import/prefer-default-export': 'off',
     'react/destructuring-assignment': 'off',
     'react/jsx-props-no-spreading': 'off',
+    'no-plusplus': ['error', { allowForLoopAfterthoughts: true }],
+    'react/prop-types': 'off',
   },
   parserOptions: {
     ecmaVersion: 2020,
