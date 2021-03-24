@@ -1,6 +1,6 @@
 import React, { forwardRef, useEffect } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
-import { Modal } from 'react-responsive-modal';
+import Modal from 'react-modal';
 import { useKeyMap } from '../../hooks/useKeyMap';
 import { useSelected } from '../../hooks/useSelected';
 import { SelectPaletteItem } from './select-palette-item';
@@ -11,15 +11,28 @@ export interface SelectPaletteProps {
   onSelect: (item: string) => void;
   onClose: () => void;
   isOpen: boolean;
+  isFocused: boolean;
 }
 
 export const SelectPalette = forwardRef<HTMLUListElement, SelectPaletteProps>(
   (props, ref) => {
-    const { up, down } = useKeyMap();
+    const { up, down, activate } = useKeyMap();
     const [selected, dispatch] = useSelected(props.options.length);
 
-    useHotkeys(down, () => dispatch({ type: 'increase' }));
-    useHotkeys(up, () => dispatch({ type: 'decrease' }));
+    useHotkeys(down, () => dispatch({ type: 'increase' }), {
+      enabled: props.isFocused,
+    });
+    useHotkeys(up, () => dispatch({ type: 'decrease' }), {
+      enabled: props.isFocused,
+    });
+    useHotkeys(
+      activate,
+      () => props.onSelect(props.options[selected]),
+      {
+        enabled: props.isFocused,
+      },
+      [props.onSelect]
+    );
 
     useEffect(() => {
       dispatch({ type: 'reset' });
@@ -28,20 +41,19 @@ export const SelectPalette = forwardRef<HTMLUListElement, SelectPaletteProps>(
 
     return (
       <Modal
-        open={props.isOpen}
-        onClose={props.onClose}
-        showCloseIcon={false}
-        closeOnOverlayClick
-        focusTrapped
-        center
+        isOpen={props.isOpen}
+        onRequestClose={props.onClose}
+        shouldCloseOnEsc
+        shouldCloseOnOverlayClick
+        ariaHideApp={false}
       >
         <ul ref={ref}>
           {props.options.map((opt, i) => (
             <SelectPaletteItem
               value={opt}
-              selected={selected === i}
+              selected={props.isFocused && selected === i}
               key={opt}
-              onSelect={() => null}
+              onSelect={() => props.onSelect(opt)}
             />
           ))}
         </ul>

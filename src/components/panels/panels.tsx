@@ -1,5 +1,5 @@
 import { log } from 'electron-log';
-import React, { useState } from 'react';
+import React from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
 import { ReflexContainer, ReflexElement, ReflexSplitter } from 'react-reflex';
 import { isDev } from '../../config';
@@ -17,17 +17,20 @@ export const Panels = () => {
   const focus = useFocus();
   const focusAction = useFocusAction();
 
-  useHotkeys(switchPanel, () =>
-    focusAction((s) => {
-      switch (s) {
-        case 'left-panel':
-          return 'right-panel';
-        case 'right-panel':
-          return 'left-panel';
-        default:
-          return s;
-      }
-    })
+  useHotkeys(
+    switchPanel,
+    () =>
+      focusAction((s) => {
+        switch (s) {
+          case 'left-panel':
+            return 'right-panel';
+          case 'right-panel':
+            return 'left-panel';
+          default:
+            return s;
+        }
+      }),
+    { enabled: focus === 'left-panel' || focus === 'right-panel' }
   );
 
   return (

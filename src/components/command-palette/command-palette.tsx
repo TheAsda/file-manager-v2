@@ -1,5 +1,5 @@
 import { log } from 'electron-log';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
 import { isDev } from '../../config';
 import { useCommands } from '../../hooks/useCommands';
@@ -17,7 +17,6 @@ export const CommandPalette = () => {
   const commands = useCommands();
   const [isOpen, setIsOpen] = useState(false);
   const focus = useFocus();
-  const ref = useRef<HTMLUListElement>(null);
   const focusAction = useFocusAction();
   const prevRef = useRef<FocusZone | null>(null);
 
@@ -37,19 +36,15 @@ export const CommandPalette = () => {
     setIsOpen(false);
   };
 
-  useEffect(() => {
-    if (focus === 'command-palette') {
-      ref.current?.focus();
-    }
-  }, [focus]);
-
   return (
     <SelectPalette
       isOpen={isOpen}
       onClose={closePalette}
-      onSelect={log}
+      onSelect={(opt) => {
+        commands.find((item) => item.name === opt)?.handler();
+      }}
       options={commands.map((item) => item.name)}
-      ref={ref}
+      isFocused={focus === 'command-palette'}
     />
   );
 };

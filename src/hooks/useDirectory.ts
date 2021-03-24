@@ -1,12 +1,12 @@
 import dayjs from 'dayjs';
 import { readdir, stat } from 'fs-extra';
 import { join } from 'path';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { isHiddenSync } from 'hidefile';
 import { error, log } from 'electron-log';
 import { FileInfo } from '../types/file-info';
 
-export const useDirectory = (directory: string): FileInfo[] => {
+export const useDirectory = (directory: string) => {
   const [state, setState] = useState<FileInfo[]>([]);
   const [finished, setFinished] = useState(true);
   const prevDir = useRef('');
@@ -49,28 +49,32 @@ export const useDirectory = (directory: string): FileInfo[] => {
     }
   }, [directory, prevDir]);
 
+  const getInfo = useCallback(async () => {
+    const chunk: Promise<FileInfo>[] = [];
+
+    for (let i = 0; i < state.length; i++) {
+      const newItem = getFileInfo(state[i]);
+      chunk.push(newItem);
+    }
+
+    Promise.all(chunk)
+      .then((data) => setState(data))
+      .catch(error);
+  }, [state]);
+
   useEffect(() => {
     if (finished) {
       return;
     }
 
-    const getInfo = async () => {
-      const chunk: Promise<FileInfo>[] = [];
-
-      for (let i = 0; i < state.length; i++) {
-        const newItem = getFileInfo(state[i]);
-        chunk.push(newItem);
-      }
-
-      Promise.all(chunk)
-        .then((data) => setState(data))
-        .catch(error);
-    };
-
     getInfo()
       .then(() => setFinished(true))
       .catch(error);
-  }, [finished, state]);
+  }, [finished, getInfo, state]);
 
-  return state;
+  const updateDirectory = () => {
+    getInfo();
+  };
+
+  return { data: state, updateDirectory };
 };

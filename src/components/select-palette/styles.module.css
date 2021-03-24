@@ -9,8 +9,3 @@
 .select-palette__item:hover {
   background-color: lightgray;
 }
-
-.select-palette__item--selected {
-  composes: select-palette__item;
-  background-color: darkgray;
-}

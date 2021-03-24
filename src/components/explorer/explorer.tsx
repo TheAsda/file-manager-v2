@@ -7,7 +7,6 @@ import { FileInfo } from '../../types/file-info';
 import styles from './styles.module.css';
 import { ExplorerRow } from './explorer-row';
 import { ExplorerHeader } from './explorer-header';
-import { ExplorerEditableRow } from './explorer-editable-row';
 
 export interface ExplorerProps {
   data: FileInfo[];
@@ -15,7 +14,6 @@ export interface ExplorerProps {
   onSelect: (index: number) => void;
   onActivate: (index: number) => void;
   editable: number | null;
-  isNew?: boolean;
 }
 
 export const Explorer = (props: ExplorerProps) => {
@@ -65,9 +63,6 @@ export const Explorer = (props: ExplorerProps) => {
           onActivate={() => props.onActivate(i)}
         />
       ))}
-      {props.isNew && (
-        <ExplorerEditableRow sizes={columnsSizes} columns={columns} />
-      )}
     </div>
   );
 };

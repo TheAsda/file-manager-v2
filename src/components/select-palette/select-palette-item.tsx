@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import styles from './styles.module.css';
 
 export interface SelectPaletteItemProps {
@@ -8,15 +8,22 @@ export interface SelectPaletteItemProps {
 }
 
 export const SelectPaletteItem = (props: SelectPaletteItemProps) => {
+  const ref = useRef<HTMLLIElement>(null);
+
+  useEffect(() => {
+    if (props.selected) {
+      ref.current?.focus();
+    }
+  }, [props.selected]);
+
   return (
     <li
+      ref={ref}
       role="menuitem"
+      tabIndex={0}
       onKeyPress={props.onSelect}
-      className={
-        props.selected
-          ? styles['select-palette__item']
-          : styles['select-palette__item--selected']
-      }
+      className={styles['select-palette__item']}
+      onClick={props.onSelect}
     >
       {props.value}
     </li>

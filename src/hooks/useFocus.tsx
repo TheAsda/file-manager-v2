@@ -34,6 +34,7 @@ export const useFocus = () => {
 
   return context;
 };
+
 export const useFocusAction = () => {
   const context = useContext(FocusActionContext);
 
