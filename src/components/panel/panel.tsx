@@ -74,6 +74,7 @@ export const Panel = ({ isFocused }: PanelProps) => {
         name: 'New file',
         handler: () => {
           openInputModal((value) => {
+            log(value);
             updateDirectory();
           });
         },
