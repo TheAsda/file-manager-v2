@@ -18,7 +18,8 @@ export const SelectPaletteItem = (props: SelectPaletteItemProps) => {
   return (
     <li
       ref={ref}
-      role="menuitem"
+      role="option"
+      aria-selected={props.selected}
       tabIndex={0}
       onKeyPress={props.onSelect}
       className="cursor-pointer bg-gray-400 hover:bg-gray-300"
