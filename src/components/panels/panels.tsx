@@ -6,7 +6,6 @@ import { isDev } from '../../config';
 import { useFocus, useFocusAction } from '../../hooks/useFocus';
 import { useKeyMap } from '../../hooks/useKeyMap';
 import { Panel } from '../panel/panel';
-import styles from './styles.module.css';
 
 export const Panels = () => {
   if (isDev) {
@@ -34,7 +33,7 @@ export const Panels = () => {
   );
 
   return (
-    <ReflexContainer orientation="vertical" className={styles.panels}>
+    <ReflexContainer orientation="vertical">
       <ReflexElement>
         <Panel isFocused={focus === 'left-panel'} />
       </ReflexElement>
