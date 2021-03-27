@@ -1,8 +1,8 @@
 import React, { useEffect, useRef } from 'react';
+import cx from 'classnames';
 import { FileInfo } from '../../types/file-info';
 import { ExplorerCell } from './explorer-cell';
 import { Column } from './useColumns';
-import styles from './styles.module.css';
 
 export interface ExplorerRowProps {
   columns: Column<FileInfo>[];
@@ -29,7 +29,7 @@ export const ExplorerRow = (props: ExplorerRowProps) => {
   return (
     // eslint-disable-next-line jsx-a11y/click-events-have-key-events
     <div
-      className={styles.explorer__row}
+      className={cx('grid hover:bg-gray-500', props.selected && 'bg-gray-400')}
       style={{
         gridTemplateColumns: props.sizes.map((item) => `${item}px`).join(' '),
       }}

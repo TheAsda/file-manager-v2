@@ -4,7 +4,6 @@ import { useMeasure } from 'react-use';
 import { isDev } from '../../config';
 import { useColumns } from './useColumns';
 import { FileInfo } from '../../types/file-info';
-import styles from './styles.module.css';
 import { ExplorerRow } from './explorer-row';
 import { ExplorerHeader } from './explorer-header';
 
@@ -50,7 +49,7 @@ export const Explorer = (props: ExplorerProps) => {
   }, [width, columnsSizes, columns.length]);
 
   return (
-    <div className={styles.explorer} ref={ref}>
+    <div className="w-full" ref={ref}>
       <ExplorerHeader columns={columns} sizes={columnsSizes} />
       {props.data.map((item, i) => (
         <ExplorerRow

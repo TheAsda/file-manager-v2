@@ -1,7 +1,6 @@
 import React from 'react';
 import { FileInfo } from '../../types/file-info';
 import { Column } from './useColumns';
-import styles from './styles.module.css';
 import { ExplorerCell } from './explorer-cell';
 
 export interface ExplorerHeaderProps {
@@ -16,16 +15,13 @@ export const ExplorerHeader = ({ columns, sizes }: ExplorerHeaderProps) => {
 
   return (
     <div
-      className={styles.explorer__header}
+      className="grid"
       style={{
         gridTemplateColumns: sizes.map((item) => `${item}px`).join(' '),
       }}
     >
       {columns.map((col) => (
-        <ExplorerCell
-          className={styles['explorer__header-cell']}
-          key={col.header}
-        >
+        <ExplorerCell className="font-bold" key={col.header}>
           {col.header}
         </ExplorerCell>
       ))}

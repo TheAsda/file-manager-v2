@@ -1,5 +1,4 @@
 import React, { useEffect, useRef } from 'react';
-import styles from './styles.module.css';
 
 export interface SelectPaletteItemProps {
   selected: boolean;
@@ -22,7 +21,7 @@ export const SelectPaletteItem = (props: SelectPaletteItemProps) => {
       role="menuitem"
       tabIndex={0}
       onKeyPress={props.onSelect}
-      className={styles['select-palette__item']}
+      className="cursor-pointer bg-gray-400 hover:bg-gray-300"
       onClick={props.onSelect}
     >
       {props.value}

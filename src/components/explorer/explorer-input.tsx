@@ -1,5 +1,4 @@
 import React from 'react';
-import styles from './styles.module.css';
 
 export interface ExplorerInputProps {
   value: string;
@@ -11,7 +10,7 @@ export const ExplorerInput = ({ value, onChange }: ExplorerInputProps) => {
     <input
       value={value}
       onChange={(e) => onChange(e.target.value)}
-      className={styles.explorer__input}
+      className="w-full"
     />
   );
 };
