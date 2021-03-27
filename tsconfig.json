@@ -10,6 +10,7 @@
     "strict": true,
     "pretty": true,
     "sourceMap": true,
+    "skipLibCheck": true,
     /* Additional Checks */
     "noUnusedLocals": true,
     "noUnusedParameters": true,
@@ -29,6 +30,6 @@
     "src/renderer.prod.js",
     "src/dist",
     ".erb/dll",
-    "**/node_modules/**"
+    "node_modules/"
   ]
 }
