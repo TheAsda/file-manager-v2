@@ -1,24 +1,23 @@
-import { log, warn } from 'electron-log';
+import { warn } from 'electron-log';
 import React, { useMemo, useState } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
-import { isDev } from '../../config';
 import { useRegisterCommands } from '../../hooks/useCommands';
 import { useDirectory } from '../../hooks/useDirectory';
 import { useKeyMap } from '../../hooks/useKeyMap';
 import { usePath } from '../../hooks/usePath';
 import { useSelected } from '../../hooks/useSelected';
 import { Command } from '../../types/command';
+import { renderLog } from '../../utils/renderLog';
 import { Explorer } from '../explorer/explorer';
 import { useInputModal } from '../input-modal/input-modal';
 
 export interface PanelProps {
   isFocused: boolean;
+  onFocus: () => void;
 }
 
-export const Panel = ({ isFocused }: PanelProps) => {
-  if (isDev) {
-    log(`Panel rendered`);
-  }
+export const Panel = ({ isFocused, onFocus }: PanelProps) => {
+  renderLog('Panel');
 
   const [path, pathDispatch] = usePath(process.cwd());
 
@@ -74,7 +73,6 @@ export const Panel = ({ isFocused }: PanelProps) => {
         name: 'New file',
         handler: () => {
           openInputModal((value) => {
-            log(value);
             updateDirectory();
           });
         },
@@ -97,12 +95,20 @@ export const Panel = ({ isFocused }: PanelProps) => {
 
   useRegisterCommands(isFocused ? 'panel' : null, commands);
 
+  const onSelect = (index: number) => {
+    if (!isFocused) {
+      onFocus();
+    }
+
+    selectedDispatch({ type: 'select', index });
+  };
+
   return (
     <div>
       <Explorer
         data={data}
         selected={isFocused ? selected : null}
-        onSelect={(index) => selectedDispatch({ type: 'select', index })}
+        onSelect={onSelect}
         onActivate={(index) =>
           data[index].isDirectory &&
           pathDispatch({ type: 'enter', name: data[index].name })

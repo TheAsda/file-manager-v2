@@ -1,11 +1,10 @@
-import { log } from 'electron-log';
 import React, { useEffect, useState } from 'react';
 import { useMeasure } from 'react-use';
-import { isDev } from '../../config';
 import { useColumns } from './useColumns';
 import { FileInfo } from '../../types/file-info';
 import { ExplorerRow } from './explorer-row';
 import { ExplorerHeader } from './explorer-header';
+import { renderLog } from '../../utils/renderLog';
 
 export interface ExplorerProps {
   data: FileInfo[];
@@ -16,9 +15,7 @@ export interface ExplorerProps {
 }
 
 export const Explorer = (props: ExplorerProps) => {
-  if (isDev) {
-    log('Explorer rendered');
-  }
+  renderLog('Explorer');
 
   const [ref, { width }] = useMeasure<HTMLDivElement>();
   const columns = useColumns();

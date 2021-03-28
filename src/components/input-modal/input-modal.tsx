@@ -10,6 +10,7 @@ import Modal from 'react-modal';
 import { useFocus, useFocusAction } from '../../hooks/useFocus';
 import { useKeyMap } from '../../hooks/useKeyMap';
 import { FocusZone } from '../../types/focus-zone';
+import { renderLog } from '../../utils/renderLog';
 
 export type OnComplete = (value: string) => void;
 
@@ -57,6 +58,8 @@ const reducer = (
 export const InputModalProvider = ({
   children,
 }: PropsWithChildren<unknown>) => {
+  renderLog('InputModalProvider');
+
   const { activate } = useKeyMap();
   const focus = useFocus();
   const focusAction = useFocusAction();

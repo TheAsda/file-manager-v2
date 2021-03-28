@@ -73,9 +73,11 @@ export const useRegisterCommands = (
 
   useEffect(() => {
     if (key === null) {
-      return () => null;
+      return;
     }
     dispatch({ type: 'register', key, commands });
+
+    // eslint-disable-next-line consistent-return
     return () => {
       dispatch({ type: 'unregister', key });
     };
