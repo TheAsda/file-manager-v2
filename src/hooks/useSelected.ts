@@ -34,7 +34,7 @@ const reducer = (state: State, action: SelectedActions): State => {
           selected: state.selected + 1,
         };
       }
-      return state;
+      return { ...state };
     case 'decrease':
       if (state.selected > 0) {
         return {
@@ -42,7 +42,7 @@ const reducer = (state: State, action: SelectedActions): State => {
           selected: state.selected - 1,
         };
       }
-      return state;
+      return { ...state };
     case 'reset':
       return {
         max: state.max,
