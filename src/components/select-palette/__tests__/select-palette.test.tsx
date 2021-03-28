@@ -8,12 +8,14 @@ jest.mock('../../../hooks/useKeyMap', () => ({
     up: 'a',
     down: 'b',
     activate: 'c',
+    escape: 'd',
   }),
 }));
 
 const downEvent = new KeyboardEvent('keydown', { keyCode: 66, key: 'b' });
 const upEvent = new KeyboardEvent('keydown', { keyCode: 65, key: 'a' });
 const activateEvent = new KeyboardEvent('keydown', { keyCode: 67, key: 'c' });
+const escapeEvent = new KeyboardEvent('keydown', { keyCode: 68, key: 'd' });
 
 const onCloseMock = jest.fn();
 const onSelectMock = jest.fn();
@@ -279,5 +281,46 @@ describe('SelectPalette', () => {
 
     expect(onSelectMock).toBeCalledTimes(1);
     expect(onSelectMock).toBeCalledWith(exampleOptions[2]);
+  });
+
+  it('should close on escape', () => {
+    render(
+      <SelectPalette
+        isOpen
+        onClose={onCloseMock}
+        onSelect={onSelectMock}
+        options={exampleOptions}
+      />
+    );
+
+    act(() => {
+      document.dispatchEvent(escapeEvent);
+    });
+
+    expect(onCloseMock).toBeCalledTimes(1);
+    expect(onSelectMock).not.toBeCalled();
+  });
+
+  it('should close on click out', () => {
+    const component = render(
+      <SelectPalette
+        isOpen
+        onClose={onCloseMock}
+        onSelect={onSelectMock}
+        options={exampleOptions}
+      />
+    );
+
+    const overlay = component.baseElement.querySelector('.ReactModal__Overlay');
+
+    expect(overlay).not.toBe(null);
+
+    act(() => {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      fireEvent.click(overlay!);
+    });
+
+    expect(onCloseMock).toBeCalledTimes(1);
+    expect(onSelectMock).not.toBeCalled();
   });
 });

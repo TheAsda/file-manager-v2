@@ -15,7 +15,7 @@ export interface SelectPaletteProps {
 
 export const SelectPalette = forwardRef<HTMLUListElement, SelectPaletteProps>(
   (props, ref) => {
-    const { up, down, activate } = useKeyMap();
+    const { up, down, activate, escape } = useKeyMap();
     const [selected, dispatch] = useSelected(props.options.length);
 
     useHotkeys(down, () => dispatch({ type: 'increase' }), {
@@ -32,6 +32,9 @@ export const SelectPalette = forwardRef<HTMLUListElement, SelectPaletteProps>(
       },
       [props.onSelect, selected]
     );
+    useHotkeys(escape, () => props.onClose(), { enabled: props.isOpen }, [
+      props.onClose,
+    ]);
 
     useEffect(() => {
       dispatch({ type: 'reset' });
@@ -50,7 +53,6 @@ export const SelectPalette = forwardRef<HTMLUListElement, SelectPaletteProps>(
       <Modal
         isOpen={props.isOpen}
         onRequestClose={props.onClose}
-        shouldCloseOnEsc
         shouldCloseOnOverlayClick
         ariaHideApp={false}
       >

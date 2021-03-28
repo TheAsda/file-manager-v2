@@ -10,6 +10,7 @@ export const useKeyMap = () => {
       back: 'backspace',
       activate: 'enter',
       switchPanel: 'tab',
+      escape: 'escape',
     }),
     []
   );
