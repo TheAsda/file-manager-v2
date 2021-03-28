@@ -30,7 +30,7 @@ export const SelectPalette = forwardRef<HTMLUListElement, SelectPaletteProps>(
       {
         enabled: props.isOpen,
       },
-      [props.onSelect]
+      [props.onSelect, selected]
     );
 
     useEffect(() => {

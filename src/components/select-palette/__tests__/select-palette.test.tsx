@@ -1,6 +1,6 @@
 import React from 'react';
 import '@testing-library/jest-dom';
-import { fireEvent, render } from '@testing-library/react';
+import { act, fireEvent, render } from '@testing-library/react';
 import { SelectPalette } from '../select-palette';
 
 jest.mock('../../../hooks/useKeyMap', () => ({
@@ -10,6 +10,10 @@ jest.mock('../../../hooks/useKeyMap', () => ({
     activate: 'c',
   }),
 }));
+
+const downEvent = new KeyboardEvent('keydown', { keyCode: 66, key: 'b' });
+const upEvent = new KeyboardEvent('keydown', { keyCode: 65, key: 'a' });
+const activateEvent = new KeyboardEvent('keydown', { keyCode: 67, key: 'c' });
 
 const onCloseMock = jest.fn();
 const onSelectMock = jest.fn();
@@ -71,7 +75,7 @@ describe('SelectPalette', () => {
     expect(onSelectMock).not.toBeCalled();
   });
 
-  it('should select item on click', () => {
+  it('should activate item on click', () => {
     const component = render(
       <SelectPalette
         isOpen
@@ -92,5 +96,160 @@ describe('SelectPalette', () => {
     expect(onCloseMock).not.toBeCalled();
     expect(onSelectMock).toBeCalledTimes(1);
     expect(onSelectMock).toBeCalledWith(exampleOptions[1]);
+  });
+
+  it('should select item on key down', () => {
+    const component = render(
+      <SelectPalette
+        isOpen
+        onClose={onCloseMock}
+        onSelect={onSelectMock}
+        options={exampleOptions}
+      />
+    );
+
+    const options = component.getAllByRole('option');
+    const option = options[0];
+    const option2 = options[1];
+
+    act(() => {
+      document.dispatchEvent(downEvent);
+    });
+
+    expect(option.getAttribute('aria-selected')).toEqual('false');
+    expect(option2.getAttribute('aria-selected')).toEqual('true');
+    expect(onCloseMock).not.toBeCalled();
+    expect(onSelectMock).not.toBeCalled();
+  });
+
+  it('should select item on key up', () => {
+    const component = render(
+      <SelectPalette
+        isOpen
+        onClose={onCloseMock}
+        onSelect={onSelectMock}
+        options={exampleOptions}
+      />
+    );
+
+    const options = component.getAllByRole('option');
+    const option = options[0];
+    const option2 = options[1];
+
+    act(() => {
+      document.dispatchEvent(downEvent);
+    });
+    act(() => {
+      document.dispatchEvent(upEvent);
+    });
+
+    expect(option.getAttribute('aria-selected')).toEqual('true');
+    expect(option2.getAttribute('aria-selected')).toEqual('false');
+    expect(onCloseMock).not.toBeCalled();
+    expect(onSelectMock).not.toBeCalled();
+  });
+
+  it('should activate item on activate', () => {
+    const component = render(
+      <SelectPalette
+        isOpen
+        onClose={onCloseMock}
+        onSelect={onSelectMock}
+        options={exampleOptions}
+      />
+    );
+
+    const options = component.getAllByRole('option');
+    const option = options[0];
+
+    act(() => {
+      document.dispatchEvent(activateEvent);
+    });
+
+    expect(option.getAttribute('aria-selected')).toEqual('true');
+    expect(onCloseMock).not.toBeCalled();
+    expect(onSelectMock).toBeCalledTimes(1);
+    expect(onSelectMock).toBeCalledWith(exampleOptions[0]);
+  });
+
+  it('should activate next item', () => {
+    const component = render(
+      <SelectPalette
+        isOpen
+        onClose={onCloseMock}
+        onSelect={onSelectMock}
+        options={exampleOptions}
+      />
+    );
+
+    const options = component.getAllByRole('option');
+    const option = options[0];
+    const option2 = options[1];
+
+    act(() => {
+      document.dispatchEvent(downEvent);
+    });
+    act(() => {
+      document.dispatchEvent(activateEvent);
+    });
+
+    expect(option.getAttribute('aria-selected')).toEqual('false');
+    expect(option2.getAttribute('aria-selected')).toEqual('true');
+    expect(onCloseMock).not.toBeCalled();
+    expect(onSelectMock).toBeCalledTimes(1);
+    expect(onSelectMock).toBeCalledWith(exampleOptions[1]);
+  });
+
+  it('should not activate item if closed', () => {
+    render(
+      <SelectPalette
+        isOpen={false}
+        onClose={onCloseMock}
+        onSelect={onSelectMock}
+        options={exampleOptions}
+      />
+    );
+
+    act(() => {
+      document.dispatchEvent(downEvent);
+    });
+    act(() => {
+      document.dispatchEvent(activateEvent);
+    });
+
+    expect(onCloseMock).not.toBeCalled();
+    expect(onSelectMock).not.toBeCalled();
+  });
+
+  it('should not select out of bound', () => {
+    const component = render(
+      <SelectPalette
+        isOpen
+        onClose={onCloseMock}
+        onSelect={onSelectMock}
+        options={exampleOptions}
+      />
+    );
+
+    const options = component.getAllByRole('option');
+    const option = options[0];
+
+    act(() => {
+      document.dispatchEvent(upEvent);
+    });
+    act(() => {
+      document.dispatchEvent(upEvent);
+    });
+
+    expect(option.getAttribute('aria-selected')).toEqual('true');
+    expect(onCloseMock).not.toBeCalled();
+    expect(onSelectMock).not.toBeCalled();
+
+    act(() => {
+      document.dispatchEvent(activateEvent);
+    });
+
+    expect(onSelectMock).toBeCalledTimes(1);
+    expect(onSelectMock).toBeCalledWith(exampleOptions[0]);
   });
 });

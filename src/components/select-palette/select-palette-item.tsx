@@ -16,12 +16,12 @@ export const SelectPaletteItem = (props: SelectPaletteItemProps) => {
   }, [props.selected]);
 
   return (
+    // eslint-disable-next-line jsx-a11y/click-events-have-key-events
     <li
       ref={ref}
       role="option"
       aria-selected={props.selected}
       tabIndex={0}
-      onKeyPress={props.onSelect}
       className="cursor-pointer bg-gray-400 hover:bg-gray-300"
       onClick={props.onSelect}
     >
