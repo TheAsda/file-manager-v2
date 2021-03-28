@@ -221,7 +221,7 @@ describe('SelectPalette', () => {
     expect(onSelectMock).not.toBeCalled();
   });
 
-  it('should not select out of bound', () => {
+  it('should not select out of bound top', () => {
     const component = render(
       <SelectPalette
         isOpen
@@ -237,9 +237,6 @@ describe('SelectPalette', () => {
     act(() => {
       document.dispatchEvent(upEvent);
     });
-    act(() => {
-      document.dispatchEvent(upEvent);
-    });
 
     expect(option.getAttribute('aria-selected')).toEqual('true');
     expect(onCloseMock).not.toBeCalled();
@@ -251,5 +248,36 @@ describe('SelectPalette', () => {
 
     expect(onSelectMock).toBeCalledTimes(1);
     expect(onSelectMock).toBeCalledWith(exampleOptions[0]);
+  });
+
+  it('should not select out of bound bottom', () => {
+    const component = render(
+      <SelectPalette
+        isOpen
+        onClose={onCloseMock}
+        onSelect={onSelectMock}
+        options={exampleOptions}
+      />
+    );
+
+    const options = component.getAllByRole('option');
+    const option = options[2];
+
+    for (let index = 0; index < exampleOptions.length + 1; index++) {
+      act(() => {
+        document.dispatchEvent(downEvent);
+      });
+    }
+
+    expect(option.getAttribute('aria-selected')).toEqual('true');
+    expect(onCloseMock).not.toBeCalled();
+    expect(onSelectMock).not.toBeCalled();
+
+    act(() => {
+      document.dispatchEvent(activateEvent);
+    });
+
+    expect(onSelectMock).toBeCalledTimes(1);
+    expect(onSelectMock).toBeCalledWith(exampleOptions[2]);
   });
 });
