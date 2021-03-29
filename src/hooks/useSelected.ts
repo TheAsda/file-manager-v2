@@ -54,7 +54,7 @@ const reducer = (state: State, action: SelectedActions): State => {
         max: action.max,
       };
     case 'select':
-      if (action.index < state.max - 1 && action.index > 0) {
+      if (action.index < state.max && action.index >= 0) {
         return {
           max: state.max,
           selected: action.index,

@@ -1,5 +1,5 @@
 import { join, normalize } from 'path';
-import { useReducer } from 'react';
+import { useMemo, useReducer } from 'react';
 
 type PathStorage = string;
 
@@ -26,5 +26,7 @@ const reducer = (state: PathStorage, action: PathActions): PathStorage => {
 export const usePath = (initialPath: string) => {
   const [path, dispatch] = useReducer(reducer, initialPath);
 
-  return [path, dispatch] as const;
+  const p = useMemo(() => path, [path]);
+
+  return [p, dispatch] as const;
 };
