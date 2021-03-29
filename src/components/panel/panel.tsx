@@ -74,7 +74,7 @@ export const Panel = ({ isFocused, onFocus }: PanelProps) => {
       {
         name: 'New file',
         handler: () => {
-          openInputModal((value) => {
+          openInputModal('New file', (value) => {
             createFile(join(path, value))
               .then(() => {
                 return updateDirectory();

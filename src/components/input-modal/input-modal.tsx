@@ -13,10 +13,11 @@ import { FocusZone } from '../../types/focus-zone';
 import { renderLog } from '../../utils/renderLog';
 
 export type OnComplete = (value: string) => void;
+export type OpenInputModal = (title: string, onComplete: OnComplete) => void;
 
 const InputModalContext = createContext<
   | {
-      openInputModal: (handler: OnComplete) => void;
+      openInputModal: OpenInputModal;
     }
   | undefined
 >(undefined);
@@ -24,12 +25,14 @@ const InputModalContext = createContext<
 interface InputModalState {
   isOpen: boolean;
   onComplete?: null | OnComplete;
+  title?: string;
 }
 
 export type InputModalActions =
   | {
       type: 'open';
       onComplete: OnComplete;
+      title: string;
     }
   | {
       type: 'close';
@@ -44,11 +47,13 @@ const reducer = (
       return {
         isOpen: true,
         onComplete: action.onComplete,
+        title: action.title,
       };
     case 'close':
       return {
         isOpen: false,
-        onComplete: null,
+        onComplete: undefined,
+        title: undefined,
       };
     default:
       throw new Error('Unknown action type');
@@ -67,7 +72,6 @@ export const InputModalProvider = ({
   const ref = useRef<HTMLInputElement>(null);
   const [state, dispatch] = useReducer(reducer, {
     isOpen: false,
-    onComplete: null,
   });
 
   const closeInputModal = () => {
@@ -78,13 +82,14 @@ export const InputModalProvider = ({
     dispatch({ type: 'close' });
   };
 
-  const openInputModal = (onComplete: OnComplete) => {
+  const openInputModal: OpenInputModal = (title, onComplete) => {
     focusAction((s) => {
       prevRef.current = s;
       return 'input-modal';
     });
     dispatch({
       type: 'open',
+      title,
       onComplete: (value) => {
         onComplete(value);
         closeInputModal();
@@ -92,17 +97,19 @@ export const InputModalProvider = ({
     });
   };
 
+  const onOk = () => {
+    const value = ref.current?.value;
+
+    if (typeof value !== 'string' || !state.onComplete) {
+      return;
+    }
+
+    state.onComplete(value);
+  };
+
   useHotkeys(
     activate,
-    () => {
-      const value = ref.current?.value;
-
-      if (typeof value !== 'string' || !state.onComplete) {
-        return;
-      }
-
-      state.onComplete(value);
-    },
+    onOk,
     { enabled: focus === 'input-modal', enableOnTags: ['INPUT'] },
     [state.onComplete]
   );
@@ -119,8 +126,28 @@ export const InputModalProvider = ({
           ref.current?.focus();
         }}
         ariaHideApp={false}
+        className="grid place-items-center w-full h-full"
       >
-        <input ref={ref} />
+        <div className="bg-gray-700 p-3 flex flex-col items-stretch gap-2 w-96 rounded-md">
+          <h1 className="text-white">{state.title}</h1>
+          <input ref={ref} />
+          <div className="flex justify-end gap-2">
+            <button
+              type="button"
+              className="bg-gray-600 p-1 rounded-md text-white"
+              onClick={closeInputModal}
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className="bg-gray-600 p-1 rounded-md text-white"
+              onClick={onOk}
+            >
+              Ok
+            </button>
+          </div>
+        </div>
       </Modal>
     </InputModalContext.Provider>
   );
