@@ -1,4 +1,5 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useRef } from 'react';
+import cx from 'classnames';
 
 export interface SelectPaletteItemProps {
   selected: boolean;
@@ -9,20 +10,15 @@ export interface SelectPaletteItemProps {
 export const SelectPaletteItem = (props: SelectPaletteItemProps) => {
   const ref = useRef<HTMLLIElement>(null);
 
-  useEffect(() => {
-    if (props.selected) {
-      ref.current?.focus();
-    }
-  }, [props.selected]);
-
   return (
-    // eslint-disable-next-line jsx-a11y/click-events-have-key-events
     <li
       ref={ref}
       role="option"
       aria-selected={props.selected}
-      tabIndex={0}
-      className="cursor-pointer bg-gray-400 hover:bg-gray-300"
+      className={cx(
+        'cursor-pointer bg-gray-400 hover:bg-gray-300',
+        props.selected && 'bg-gray-500'
+      )}
       onClick={props.onSelect}
     >
       {props.value}

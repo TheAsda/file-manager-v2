@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React from 'react';
 import cx from 'classnames';
 import { FileInfo } from '../../types/file-info';
 import { ExplorerCell } from './explorer-cell';
@@ -18,16 +18,7 @@ export const ExplorerRow = (props: ExplorerRowProps) => {
     throw new Error('Sizes count are not equal to columns count');
   }
 
-  const ref = useRef<HTMLDivElement | null>(null);
-
-  useEffect(() => {
-    if (props.selected) {
-      ref.current?.focus();
-    }
-  }, [props.selected]);
-
   return (
-    // eslint-disable-next-line jsx-a11y/click-events-have-key-events
     <div
       className={cx('grid hover:bg-gray-500', props.selected && 'bg-gray-400')}
       style={{
@@ -35,10 +26,8 @@ export const ExplorerRow = (props: ExplorerRowProps) => {
       }}
       role="option"
       aria-selected={props.selected}
-      tabIndex={0}
       onClick={props.onSelect}
       onDoubleClick={props.onActivate}
-      ref={ref}
     >
       {props.columns.map((col) => (
         <ExplorerCell key={col.header}>
