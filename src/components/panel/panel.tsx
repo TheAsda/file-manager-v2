@@ -110,18 +110,22 @@ export const Panel = ({ isFocused, onFocus }: PanelProps) => {
   };
 
   return (
-    <div>
-      <PathLine path={path} />
-      <Explorer
-        data={data}
-        selected={isFocused ? selected : null}
-        onSelect={onSelect}
-        onActivate={(index) =>
-          data[index].isDirectory &&
-          pathDispatch({ type: 'enter', name: data[index].name })
-        }
-        editable={editable !== null ? editable.index : null}
-      />
+    <div className="h-full w-full overflow-hidden">
+      <div className="panel-header">
+        <PathLine path={path} />
+      </div>
+      <div className="w-full panel-content overflow-hidden bg-gray-800">
+        <Explorer
+          data={data}
+          selected={isFocused ? selected : null}
+          onSelect={onSelect}
+          onActivate={(index) =>
+            data[index].isDirectory &&
+            pathDispatch({ type: 'enter', name: data[index].name })
+          }
+          editable={editable !== null ? editable.index : null}
+        />
+      </div>
     </div>
   );
 };

@@ -15,7 +15,7 @@ export const ExplorerHeader = ({ columns, sizes }: ExplorerHeaderProps) => {
 
   return (
     <div
-      className="grid"
+      className="grid sticky top-0 bg-black"
       style={{
         gridTemplateColumns: sizes.map((item) => `${item}px`).join(' '),
       }}

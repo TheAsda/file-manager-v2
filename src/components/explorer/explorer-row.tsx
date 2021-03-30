@@ -20,7 +20,10 @@ export const ExplorerRow = (props: ExplorerRowProps) => {
 
   return (
     <div
-      className={cx('grid hover:bg-gray-500', props.selected && 'bg-gray-400')}
+      className={cx(
+        'grid hover:bg-gray-500 w-full',
+        props.selected && 'bg-gray-600'
+      )}
       style={{
         gridTemplateColumns: props.sizes.map((item) => `${item}px`).join(' '),
       }}

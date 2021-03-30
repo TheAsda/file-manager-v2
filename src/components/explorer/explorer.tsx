@@ -46,19 +46,26 @@ export const Explorer = (props: ExplorerProps) => {
   }, [width, columnsSizes, columns.length]);
 
   return (
-    <div className="w-full" ref={ref}>
+    <div
+      className="flex flex-col flex-grow h-full bg-gray-900 text-white m-1 overflow-x-auto"
+      ref={ref}
+    >
       <ExplorerHeader columns={columns} sizes={columnsSizes} />
-      {props.data.map((item, i) => (
-        <ExplorerRow
-          sizes={columnsSizes}
-          key={item.name}
-          data={item}
-          columns={columns}
-          selected={i === props.selected}
-          onSelect={() => props.onSelect(i)}
-          onActivate={() => props.onActivate(i)}
-        />
-      ))}
+      <div className="flex-grow bg-gray-900 explorer-content">
+        <div className="w-full">
+          {props.data.map((item, i) => (
+            <ExplorerRow
+              sizes={columnsSizes}
+              key={item.name}
+              data={item}
+              columns={columns}
+              selected={i === props.selected}
+              onSelect={() => props.onSelect(i)}
+              onActivate={() => props.onActivate(i)}
+            />
+          ))}
+        </div>
+      </div>
     </div>
   );
 };

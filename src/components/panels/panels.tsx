@@ -30,15 +30,15 @@ export const Panels = () => {
   );
 
   return (
-    <ReflexContainer orientation="vertical">
-      <ReflexElement>
+    <ReflexContainer orientation="vertical" className="max-h-screen w-screen">
+      <ReflexElement className="h-full overflow-hidden">
         <Panel
           isFocused={focus === 'left-panel'}
           onFocus={() => focusAction('left-panel')}
         />
       </ReflexElement>
-      <ReflexSplitter />
-      <ReflexElement>
+      <ReflexSplitter className="z-0" />
+      <ReflexElement className="h-full overflow-hidden">
         <Panel
           isFocused={focus === 'right-panel'}
           onFocus={() => focusAction('right-panel')}
