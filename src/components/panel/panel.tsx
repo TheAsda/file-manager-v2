@@ -110,11 +110,9 @@ export const Panel = ({ isFocused, onFocus }: PanelProps) => {
   };
 
   return (
-    <div className="h-full w-full overflow-hidden">
-      <div className="panel-header">
-        <PathLine path={path} />
-      </div>
-      <div className="w-full panel-content overflow-hidden bg-gray-800">
+    <div className="h-full w-full overflow-hidden panel">
+      <PathLine path={path} />
+      <div className="w-full overflow-hidden bg-gray-800">
         <Explorer
           data={data}
           selected={isFocused ? selected : null}

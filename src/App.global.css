@@ -12,21 +12,29 @@
   width: 100vw;
   height: 100vh;
   --path-line-height: 32px;
+  --status-bar-height: 24px;
 }
 
-@layer utilities {
-  .panel-header {
-    height: var(--path-line-height);
-  }
-  .panel-content {
-    height: calc(100% - var(--path-line-height));
-  }
-  .explorer-content {
-    height: calc(100% - 24px);
-  }
-  .overflow-x-overlay {
-    overflow-x: overlay;
-  }
+.panel {
+  display: grid;
+  grid-template-rows: var(--path-line-height) calc(
+      100% - var(--path-line-height)
+    );
+}
+
+.explorer-content {
+  height: calc(100% - 24px);
+}
+
+.overflow-x-overlay {
+  overflow-x: overlay;
+}
+
+.panels {
+  display: grid;
+  grid-template-rows: calc(100% - var(--status-bar-height)) var(
+      --status-bar-height
+    );
 }
 
 *::-webkit-scrollbar {
