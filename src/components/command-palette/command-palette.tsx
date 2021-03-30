@@ -38,6 +38,7 @@ export const CommandPalette = () => {
       isOpen={isOpen && focus === 'command-palette'}
       onClose={closePalette}
       onSelect={(opt) => {
+        closePalette();
         commands.find((item) => item.name === opt)?.handler();
       }}
       options={commands.map((item) => item.name)}
