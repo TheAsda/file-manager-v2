@@ -6,11 +6,11 @@ import React, {
   useRef,
 } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
-import Modal from 'react-modal';
 import { useFocus, useFocusAction } from '../../hooks/useFocus';
 import { useKeyMap } from '../../hooks/useKeyMap';
 import { FocusZone } from '../../types/focus-zone';
 import { renderLog } from '../../utils/renderLog';
+import { Modal } from '../modal/modal';
 
 export type OnComplete = (value: string) => void;
 export type OpenInputModal = (title: string, onComplete: OnComplete) => void;
@@ -117,17 +117,7 @@ export const InputModalProvider = ({
   return (
     <InputModalContext.Provider value={{ openInputModal }}>
       {children}
-      <Modal
-        isOpen={state.isOpen}
-        onRequestClose={closeInputModal}
-        shouldCloseOnEsc
-        shouldCloseOnOverlayClick
-        onAfterOpen={() => {
-          ref.current?.focus();
-        }}
-        ariaHideApp={false}
-        className="grid place-items-center w-full h-full"
-      >
+      <Modal isOpen={state.isOpen} onClose={closeInputModal} isCentered>
         <div className="bg-gray-700 p-3 flex flex-col items-stretch gap-2 w-96 rounded-md">
           <h1 className="text-white">{state.title}</h1>
           <input ref={ref} />

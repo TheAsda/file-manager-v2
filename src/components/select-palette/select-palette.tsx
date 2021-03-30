@@ -1,9 +1,10 @@
-import React, { forwardRef, useEffect } from 'react';
+import { warn } from 'electron-log';
+import React, { useEffect, useMemo, useRef } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
-import Modal from 'react-modal';
 import { useKeyMap } from '../../hooks/useKeyMap';
 import { useSelected } from '../../hooks/useSelected';
 import { renderLog } from '../../utils/renderLog';
+import { Modal } from '../modal/modal';
 import { SelectPaletteItem } from './select-palette-item';
 
 export interface SelectPaletteProps {
@@ -14,52 +15,75 @@ export interface SelectPaletteProps {
   isOpen: boolean;
 }
 
-export const SelectPalette = forwardRef<HTMLUListElement, SelectPaletteProps>(
-  (props, ref) => {
-    renderLog('SelectPalette');
+export const SelectPalette = (props: SelectPaletteProps) => {
+  renderLog('SelectPalette');
 
-    const { up, down, activate, escape } = useKeyMap();
-    const [selected, dispatch] = useSelected(props.options.length);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const { up, down, activate } = useKeyMap();
+  const [selected, dispatch] = useSelected(props.options.length);
 
-    useHotkeys(down, () => dispatch({ type: 'increase' }), {
+  const keys = useMemo(() => [up, down, activate].join(','), [
+    activate,
+    down,
+    up,
+  ]);
+
+  useHotkeys(
+    keys,
+    (_, handler) => {
+      switch (handler.key) {
+        case up:
+          dispatch({ type: 'decrease' });
+          break;
+        case down:
+          dispatch({ type: 'increase' });
+          break;
+        case activate:
+          props.onSelect(props.options[selected]);
+          break;
+        default:
+          warn('Unknown hotkeys key');
+      }
+    },
+    {
       enabled: props.isOpen,
+      enableOnTags: ['INPUT'],
+    },
+    [selected, props.options, props.onSelect, keys, dispatch]
+  );
+
+  useEffect(() => {
+    dispatch({ type: 'reset' });
+  }, [dispatch, props.options]);
+
+  const onSelect = (index: number) => {
+    dispatch({
+      type: 'select',
+      index,
     });
-    useHotkeys(up, () => dispatch({ type: 'decrease' }), {
-      enabled: props.isOpen,
-    });
-    useHotkeys(
-      activate,
-      () => props.onSelect(props.options[selected]),
-      {
-        enabled: props.isOpen,
-      },
-      [props.onSelect, selected]
-    );
-    useHotkeys(escape, () => props.onClose(), { enabled: props.isOpen }, [
-      props.onClose,
-    ]);
 
-    useEffect(() => {
-      dispatch({ type: 'reset' });
-    }, [dispatch, props.options]);
+    props.onSelect(props.options[index]);
+  };
 
-    const onSelect = (index: number) => {
-      dispatch({
-        type: 'select',
-        index,
-      });
+  useEffect(() => {
+    if (props.isOpen) {
+      inputRef.current?.focus();
+    }
+  }, [props.isOpen]);
 
-      props.onSelect(props.options[index]);
-    };
-
-    return (
-      <Modal
-        isOpen={props.isOpen}
-        onRequestClose={props.onClose}
-        shouldCloseOnOverlayClick
-        ariaHideApp={false}
-      >
-        <ul ref={ref}>
+  return (
+    <Modal isOpen={props.isOpen} onClose={props.onClose}>
+      <div className="bg-gray-700 p-2 flex flex-col gap-1">
+        <input
+          type="text"
+          ref={inputRef}
+          onKeyDownCapture={(e) => {
+            if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+              e.preventDefault();
+            }
+          }}
+        />
+        <ul>
           {props.options.map((opt, i) => (
             <SelectPaletteItem
               value={opt}
@@ -69,9 +93,7 @@ export const SelectPalette = forwardRef<HTMLUListElement, SelectPaletteProps>(
             />
           ))}
         </ul>
-      </Modal>
-    );
-  }
-);
-
-SelectPalette.displayName = 'SelectPalette';
+      </div>
+    </Modal>
+  );
+};

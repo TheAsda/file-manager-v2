@@ -1,25 +1,36 @@
 import { useEffect, useMemo } from 'react';
 import hotkeys from 'hotkeys-js';
+import { Shortcut, Shortcuts } from '../types/shortcuts';
 
-export const useKeyMap = () => {
-  const data = useMemo(
+export const useKeyMap = (): Record<Shortcut, string> => {
+  const shortcuts: Shortcuts = useMemo(
     () => ({
       up: 'up',
       down: 'down',
-      openCommandPalette: 'ctrl+shift+p',
+      openCommandPalette: ['ctrl+shift+p', 'f1'],
       back: 'backspace',
       activate: 'enter',
       switchPanel: 'tab',
-      escape: 'escape',
     }),
     []
   );
 
   useEffect(() => {
-    Object.values(data).forEach((key) => {
-      hotkeys(key, (e) => e.preventDefault());
+    Object.values(shortcuts).forEach((shortcut) => {
+      if (Array.isArray(shortcut)) {
+        shortcut.forEach((item) => {
+          hotkeys(item, (e) => e.preventDefault());
+        });
+      } else {
+        hotkeys(shortcut, (e) => e.preventDefault());
+      }
     });
-  }, [data]);
+  }, [shortcuts]);
 
-  return data;
+  return Object.entries(shortcuts).reduce((acc, cur) => {
+    return {
+      ...acc,
+      [cur[0]]: Array.isArray(cur[1]) ? cur[1].join(',') : cur[1],
+    };
+  }, {} as Record<Shortcut, string>);
 };

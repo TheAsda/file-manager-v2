@@ -25,6 +25,6 @@
     "yarn.lock": true,
     "*.{css,sass,scss}.d.ts": true
   },
-  "cSpell.words": ["hidefile"],
+  "cSpell.words": ["hidefile", "testid"],
   "typescript.tsdk": "node_modules\\typescript\\lib"
 }
