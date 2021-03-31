@@ -1,38 +1,38 @@
-import { createFile } from 'fs-extra';
-import { error, warn } from 'electron-log';
-import React, { useMemo, useState } from 'react';
+import { warn } from 'electron-log';
+import React, { MutableRefObject, useMemo, useRef } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
-import { join } from 'path';
-import { useRegisterCommands } from '../../hooks/useCommands';
 import { useDirectory } from '../../hooks/useDirectory';
 import { useKeyMap } from '../../hooks/useKeyMap';
 import { usePath } from '../../hooks/usePath';
 import { useSelected } from '../../hooks/useSelected';
-import { Command } from '../../types/command';
 import { renderLog } from '../../utils/renderLog';
 import { Explorer } from '../explorer/explorer';
-import { useInputModal } from '../input-modal/input-modal';
 import { PathLine } from '../path-line/path-line';
+import { FileInfo } from '../../types/file-info';
+
+export interface PanelRef {
+  path: string;
+  currentItem: FileInfo;
+  currentElement?: HTMLElement;
+  updateDirectory: () => void;
+}
 
 export interface PanelProps {
   isFocused: boolean;
   onFocus: () => void;
+  panelRef?: MutableRefObject<PanelRef | undefined>;
 }
 
-export const Panel = ({ isFocused, onFocus }: PanelProps) => {
+export const Panel = ({ isFocused, onFocus, panelRef }: PanelProps) => {
   renderLog('Panel');
 
   const initPath = useMemo(() => process.cwd(), []);
   const [path, pathDispatch] = usePath(initPath);
 
+  const currentElementRef = useRef<HTMLDivElement>(null);
   const { up, down, back, activate } = useKeyMap();
-  const { openInputModal } = useInputModal();
   const [data, updateDirectory] = useDirectory(path);
   const [selected, selectedDispatch] = useSelected(data.length);
-  const [editable, setEditable] = useState<{
-    index: number;
-    isDirectory: boolean;
-  } | null>(null);
 
   const keys = useMemo(() => [down, up, back, activate].join(','), [
     activate,
@@ -65,42 +65,6 @@ export const Panel = ({ isFocused, onFocus }: PanelProps) => {
     [down, up, back, activate, data, selected]
   );
 
-  const commands = useMemo(() => {
-    if (!isFocused) {
-      return [];
-    }
-
-    return [
-      {
-        name: 'New file',
-        handler: () => {
-          openInputModal('New file', (value) => {
-            createFile(join(path, value))
-              .then(() => {
-                return updateDirectory();
-              })
-              .catch(error);
-          });
-        },
-      },
-      {
-        name: 'New folder',
-        handler: () => {
-          setEditable({
-            index: selected,
-            isDirectory: true,
-          });
-        },
-      },
-      {
-        name: 'Rename',
-        handler: () => {},
-      },
-    ] as Command[];
-  }, [isFocused, openInputModal, path, selected, updateDirectory]);
-
-  useRegisterCommands(isFocused ? 'panel' : null, commands);
-
   const onSelect = (index: number) => {
     if (!isFocused) {
       onFocus();
@@ -108,6 +72,18 @@ export const Panel = ({ isFocused, onFocus }: PanelProps) => {
 
     selectedDispatch({ type: 'select', index });
   };
+
+  if (panelRef !== undefined) {
+    panelRef.current = {
+      path,
+      updateDirectory,
+      currentItem: data[selected],
+      currentElement:
+        currentElementRef.current !== null
+          ? currentElementRef.current
+          : undefined,
+    };
+  }
 
   return (
     <div className="h-full w-full overflow-hidden panel">
@@ -121,7 +97,8 @@ export const Panel = ({ isFocused, onFocus }: PanelProps) => {
             data[index].isDirectory &&
             pathDispatch({ type: 'enter', name: data[index].name })
           }
-          editable={editable !== null ? editable.index : null}
+          editable={null}
+          currentElementRef={currentElementRef}
         />
       </div>
     </div>

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { MutableRefObject, useEffect, useState } from 'react';
 import { useMeasure } from 'react-use';
 import { useColumns } from './useColumns';
 import { FileInfo } from '../../types/file-info';
@@ -12,6 +12,7 @@ export interface ExplorerProps {
   onSelect: (index: number) => void;
   onActivate: (index: number) => void;
   editable: number | null;
+  currentElementRef?: MutableRefObject<HTMLDivElement | null>;
 }
 
 export const Explorer = (props: ExplorerProps) => {
@@ -62,6 +63,7 @@ export const Explorer = (props: ExplorerProps) => {
               selected={i === props.selected}
               onSelect={() => props.onSelect(i)}
               onActivate={() => props.onActivate(i)}
+              ref={props.currentElementRef}
             />
           ))}
         </div>

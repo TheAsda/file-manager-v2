@@ -2,25 +2,32 @@ import React, {
   createContext,
   PropsWithChildren,
   useContext,
+  useEffect,
   useReducer,
   useRef,
+  useState,
 } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
-import { useFocus, useFocusAction } from '../../hooks/useFocus';
 import { useKeyMap } from '../../hooks/useKeyMap';
-import { FocusZone } from '../../types/focus-zone';
 import { renderLog } from '../../utils/renderLog';
 import { Modal } from '../modal/modal';
 
 export type OnComplete = (value: string) => void;
-export type OpenInputModal = (title: string, onComplete: OnComplete) => void;
+export type OpenInputModal = (data: {
+  title: string;
+  onComplete: OnComplete;
+  initialValue?: string;
+  elementToFocus?: HTMLElement;
+}) => void;
 
-const InputModalContext = createContext<
-  | {
-      openInputModal: OpenInputModal;
-    }
-  | undefined
->(undefined);
+interface InputModalStorage {
+  openInputModal: OpenInputModal;
+  isOpened: boolean;
+}
+
+const InputModalContext = createContext<InputModalStorage | undefined>(
+  undefined
+);
 
 interface InputModalState {
   isOpen: boolean;
@@ -66,61 +73,77 @@ export const InputModalProvider = ({
   renderLog('InputModalProvider');
 
   const { activate } = useKeyMap();
-  const focus = useFocus();
-  const focusAction = useFocusAction();
-  const prevRef = useRef<FocusZone | null>(null);
+  const prevRef = useRef<HTMLElement | null>(null);
   const ref = useRef<HTMLInputElement>(null);
+  const [inputValue, setInputValue] = useState('');
   const [state, dispatch] = useReducer(reducer, {
     isOpen: false,
   });
 
   const closeInputModal = () => {
     if (prevRef.current !== null) {
-      focusAction(prevRef.current);
+      prevRef.current?.focus();
       prevRef.current = null;
     }
     dispatch({ type: 'close' });
   };
 
-  const openInputModal: OpenInputModal = (title, onComplete) => {
-    focusAction((s) => {
-      prevRef.current = s;
-      return 'input-modal';
-    });
+  const openInputModal: OpenInputModal = ({
+    onComplete,
+    title,
+    elementToFocus,
+    initialValue,
+  }) => {
+    if (elementToFocus !== undefined) {
+      prevRef.current = elementToFocus;
+    }
+    if (initialValue !== undefined) {
+      setInputValue(initialValue);
+    } else {
+      setInputValue('');
+    }
     dispatch({
       type: 'open',
       title,
-      onComplete: (value) => {
-        onComplete(value);
-        closeInputModal();
-      },
+      onComplete,
     });
   };
 
   const onOk = () => {
-    const value = ref.current?.value;
-
-    if (typeof value !== 'string' || !state.onComplete) {
+    if (!state.onComplete) {
       return;
     }
 
-    state.onComplete(value);
+    state.onComplete(inputValue);
+    closeInputModal();
   };
 
   useHotkeys(
     activate,
     onOk,
-    { enabled: focus === 'input-modal', enableOnTags: ['INPUT'] },
-    [state.onComplete]
+    { enabled: state.isOpen, enableOnTags: ['INPUT'] },
+    [state.onComplete, inputValue]
   );
 
+  useEffect(() => {
+    if (state.isOpen) {
+      ref.current?.focus();
+    }
+  }, [state.isOpen]);
+
   return (
-    <InputModalContext.Provider value={{ openInputModal }}>
+    <InputModalContext.Provider
+      value={{ openInputModal, isOpened: state.isOpen }}
+    >
       {children}
       <Modal isOpen={state.isOpen} onClose={closeInputModal} isCentered>
         <div className="bg-gray-700 p-3 flex flex-col items-stretch gap-2 w-96 rounded-md">
           <h1 className="text-white">{state.title}</h1>
-          <input ref={ref} />
+          <input
+            ref={ref}
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
+          />
           <div className="flex justify-end gap-2">
             <button
               type="button"
