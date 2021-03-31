@@ -1,6 +1,6 @@
 import { readdir } from 'fs-extra';
 import { join } from 'path';
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { error } from 'electron-log';
 import { FileInfo } from '../types/file-info';
 import { getFileInfo } from '../utils/getFileInfo';
@@ -16,8 +16,7 @@ const getDirectoryInfo = async (path: string): Promise<FileInfo[]> => {
     const chunk: Promise<FileInfo>[] = [];
 
     for (let i = 0; i < files.length; i++) {
-      const newItem = getFileInfo(files[i]);
-      chunk.push(newItem);
+      chunk.push(getFileInfo(files[i]));
     }
 
     return Promise.all(chunk);
@@ -30,12 +29,14 @@ const getDirectoryInfo = async (path: string): Promise<FileInfo[]> => {
 export const useDirectory = (directory: string) => {
   const [state, setState] = useState<FileInfo[]>([]);
 
-  const updateDirectory = useCallback(async () => {
+  const updateDirectory = async () => {
     setState(await getDirectoryInfo(directory));
-  }, [directory]);
+  };
 
   useEffect(() => {
-    (async () => setState(await getDirectoryInfo(directory)))();
+    getDirectoryInfo(directory)
+      .then((res) => setState(res))
+      .catch(error);
   }, [directory]);
 
   return [state, updateDirectory] as const;
