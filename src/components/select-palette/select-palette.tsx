@@ -3,7 +3,6 @@ import React, { useEffect, useMemo, useRef } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
 import { useKeyMap } from '../../hooks/useKeyMap';
 import { useSelected } from '../../hooks/useSelected';
-import { renderLog } from '../../utils/renderLog';
 import { Modal } from '../modal/modal';
 import { SelectPaletteItem } from './select-palette-item';
 
@@ -16,8 +15,6 @@ export interface SelectPaletteProps {
 }
 
 export const SelectPalette = (props: SelectPaletteProps) => {
-  renderLog('SelectPalette');
-
   const inputRef = useRef<HTMLInputElement>(null);
   const { up, down, activate } = useKeyMap();
   const [selected, dispatch] = useSelected(props.options.length);

@@ -2,12 +2,9 @@ import React, { useState } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
 import { useCommands } from '../../hooks/useCommands';
 import { useKeyMap } from '../../hooks/useKeyMap';
-import { renderLog } from '../../utils/renderLog';
 import { SelectPalette } from '../select-palette/select-palette';
 
 export const CommandPalette = () => {
-  renderLog('CommandPalette');
-
   const { openCommandPalette } = useKeyMap();
   const commands = useCommands();
   const [isOpen, setIsOpen] = useState(false);

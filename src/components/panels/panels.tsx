@@ -5,16 +5,13 @@ import React, { useMemo, useRef, useState } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
 import { ReflexContainer, ReflexElement, ReflexSplitter } from 'react-reflex';
 import { useKeyMap } from '../../hooks/useKeyMap';
-import { renderLog } from '../../utils/renderLog';
 import { Panel, PanelRef } from '../panel/panel';
 import { StatusBar } from '../status-bar/status-bar';
-import { useInputModal } from '../input-modal/input-modal';
 import { Command } from '../../types/command';
 import { useRegisterCommands } from '../../hooks/useCommands';
+import { useInputModal } from '../../hooks/useInputModal';
 
 export const Panels = () => {
-  renderLog('Panels');
-
   const { switchPanel } = useKeyMap();
   const { openInputModal, isOpened } = useInputModal();
   const [focusedPanel, setFocusedPanel] = useState<'left' | 'right'>('left');

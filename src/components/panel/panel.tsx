@@ -1,11 +1,10 @@
 import { warn } from 'electron-log';
-import React, { MutableRefObject, useMemo, useRef } from 'react';
+import React, { MutableRefObject, useMemo, useRef, useState } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
 import { useDirectory } from '../../hooks/useDirectory';
 import { useKeyMap } from '../../hooks/useKeyMap';
 import { usePath } from '../../hooks/usePath';
 import { useSelected } from '../../hooks/useSelected';
-import { renderLog } from '../../utils/renderLog';
 import { Explorer } from '../explorer/explorer';
 import { PathLine } from '../path-line/path-line';
 import { FileInfo } from '../../types/file-info';
@@ -24,14 +23,13 @@ export interface PanelProps {
 }
 
 export const Panel = ({ isFocused, onFocus, panelRef }: PanelProps) => {
-  renderLog('Panel');
-
   const initPath = useMemo(() => process.cwd(), []);
   const [path, pathDispatch] = usePath(initPath);
 
   const currentElementRef = useRef<HTMLDivElement>(null);
   const { up, down, back, activate } = useKeyMap();
-  const [data, updateDirectory] = useDirectory(path);
+  const [data] = useDirectory(path);
+
   const [selected, selectedDispatch] = useSelected(data.length);
 
   const keys = useMemo(() => [down, up, back, activate].join(','), [
@@ -76,7 +74,7 @@ export const Panel = ({ isFocused, onFocus, panelRef }: PanelProps) => {
   if (panelRef !== undefined) {
     panelRef.current = {
       path,
-      updateDirectory,
+      updateDirectory: () => {},
       currentItem: data[selected],
       currentElement:
         currentElementRef.current !== null

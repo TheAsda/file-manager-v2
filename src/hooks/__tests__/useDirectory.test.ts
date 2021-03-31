@@ -1,5 +1,5 @@
 import { waitFor } from '@testing-library/dom';
-import { renderHook } from '@testing-library/react-hooks';
+import { renderHook, act } from '@testing-library/react-hooks';
 import { FileInfo } from '../../types/file-info';
 import { useDirectory } from '../useDirectory';
 
@@ -86,6 +86,20 @@ describe('useDirectory', () => {
 
     waitFor(() => {
       return expect(result.current[0]).toHaveLength(500);
+    });
+  });
+
+  it('should update directory on call', () => {
+    const { result } = renderHook(() => useDirectory(examplePath));
+
+    const directoryState = result.current[0];
+
+    act(() => {
+      result.current[1]();
+    });
+
+    waitFor(() => {
+      return expect(directoryState === result.current[0]).toBe(false);
     });
   });
 });

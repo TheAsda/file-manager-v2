@@ -6,6 +6,7 @@ import { FileInfo } from '../types/file-info';
 import { getFileInfo } from '../utils/getFileInfo';
 
 const getDirectoryInfo = async (path: string): Promise<FileInfo[]> => {
+  console.log('getDirectoryInfo', path);
   try {
     const data = await readdir(path);
     const files = data.map((item) => ({
@@ -31,12 +32,11 @@ export const useDirectory = (directory: string) => {
 
   const updateDirectory = async () => {
     setState(await getDirectoryInfo(directory));
+    console.log('updateDirectory', directory);
   };
 
   useEffect(() => {
-    getDirectoryInfo(directory)
-      .then((res) => setState(res))
-      .catch(error);
+    updateDirectory();
   }, [directory]);
 
   return [state, updateDirectory] as const;

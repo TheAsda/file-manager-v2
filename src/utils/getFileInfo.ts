@@ -12,7 +12,7 @@ export async function getFileInfo(item: FileInfo): Promise<FileInfo> {
       created: dayjs(data.birthtime),
       lastModified: dayjs(data.mtime),
       isDirectory: data.isDirectory(),
-      isHidden: isHiddenSync(item.path),
+      // isHidden: isHiddenSync(item.path),
       // TODO: detect attribute
       isReadonly: false,
       // TODO: detect attribute
