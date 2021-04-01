@@ -6,11 +6,13 @@ export async function getFileInfo(
 ): Promise<FileInfoSerializable> {
   try {
     const data = await stat(item.path);
+
     return {
       ...item,
       size: data.size,
-      created: data.birthtime.toISOString(),
-      lastModified: data.mtime.toISOString(),
+      // stat has incorrect interface. Dates are dates are actually strings
+      created: (data.birthtime as unknown) as string,
+      lastModified: (data.mtime as unknown) as string,
       isDirectory: data.isDirectory(),
       // isHidden: isHiddenSync(item.path),
       // TODO: detect attribute
