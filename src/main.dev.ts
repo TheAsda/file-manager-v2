@@ -15,6 +15,7 @@ import { app, BrowserWindow, shell } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import MenuBuilder from './menu';
+import { registerIpc } from './main/registerIpc';
 
 export default class AppUpdater {
   constructor() {
@@ -50,6 +51,8 @@ const installExtensions = async () => {
     )
     .catch(console.log);
 };
+
+registerIpc();
 
 const createWindow = async () => {
   if (

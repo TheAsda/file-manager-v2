@@ -24,3 +24,15 @@ export interface FileInfo {
 
   isSystem?: boolean;
 }
+
+export interface FileInfoSerializable {
+  path: string;
+  name: string;
+  size?: number;
+  lastModified?: string;
+  created?: string;
+  isDirectory?: boolean;
+  isHidden?: boolean;
+  isReadonly?: boolean;
+  isSystem?: boolean;
+}

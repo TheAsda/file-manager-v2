@@ -1,57 +1,39 @@
-import { waitFor } from '@testing-library/dom';
 import { renderHook, act } from '@testing-library/react-hooks';
-import { FileInfo } from '../../types/file-info';
+import { FileInfoSerializable } from '../../types/file-info';
 import { useDirectory } from '../useDirectory';
 
 const examplePath = '/path/';
 const exampleFiles = ['file.txt', 'folder'];
-const manyFilesPath = '/many/files/';
 
-jest.mock('fs-extra', () => ({
-  readdir: (path: string): string[] => {
-    if (path === examplePath) {
-      return exampleFiles;
-    }
-    if (path === manyFilesPath) {
-      return Array.from(Array(500), (_, i) => `${i.toString()}.txt`);
-    }
-
-    return [exampleFiles[0]];
-  },
-}));
-
-jest.mock('../../utils/getFileInfo', () => ({
-  getFileInfo: (item: FileInfo): FileInfo => {
-    switch (item.name) {
-      case 'file.txt':
-        return {
-          ...item,
-          isDirectory: false,
-          isHidden: false,
-          isReadonly: false,
-          isSystem: false,
-          size: 15,
-        };
-      case 'folder':
-        return {
-          ...item,
-          isDirectory: true,
-          isHidden: false,
-          isReadonly: false,
-          isSystem: false,
-          size: 0,
-        };
-      default:
-        return item;
-    }
+jest.mock('electron-better-ipc', () => ({
+  ipcRenderer: {
+    callMain: (_: unknown, path: string): FileInfoSerializable[] => {
+      switch (path) {
+        case '/path/':
+          return [
+            {
+              name: 'file.txt',
+              path: '/path/file.txt',
+              isDirectory: false,
+            },
+            {
+              name: 'folder',
+              path: '/path/folder',
+              isDirectory: true,
+            },
+          ];
+        default:
+          return [];
+      }
+    },
   },
 }));
 
 describe('useDirectory', () => {
-  it('should set initial value', () => {
-    const { result } = renderHook(() => useDirectory(examplePath));
+  it('should set initial value', async () => {
+    const { result, waitFor } = renderHook(() => useDirectory(examplePath));
 
-    waitFor(() => {
+    await waitFor(() => {
       return expect(result.current[0].map((item) => item.name)).toEqual(
         exampleFiles
       );
@@ -59,7 +41,7 @@ describe('useDirectory', () => {
   });
 
   it('should update on path change', async () => {
-    const { result, rerender } = renderHook(
+    const { result, rerender, waitFor } = renderHook(
       (path: string) => useDirectory(path),
       {
         initialProps: examplePath,
@@ -72,25 +54,17 @@ describe('useDirectory', () => {
       );
     });
 
-    rerender('/another/');
+    act(() => {
+      rerender('/another/');
+    });
 
     await waitFor(() => {
-      return expect(result.current[0].map((item) => item.name)).toEqual([
-        exampleFiles[0],
-      ]);
+      return expect(result.current[0]).toHaveLength(0);
     });
   });
 
-  it('should return with many files', () => {
-    const { result } = renderHook(() => useDirectory(manyFilesPath));
-
-    waitFor(() => {
-      return expect(result.current[0]).toHaveLength(500);
-    });
-  });
-
-  it('should update directory on call', () => {
-    const { result } = renderHook(() => useDirectory(examplePath));
+  it('should update directory on call', async () => {
+    const { result, waitFor } = renderHook(() => useDirectory(examplePath));
 
     const directoryState = result.current[0];
 
@@ -98,7 +72,7 @@ describe('useDirectory', () => {
       result.current[1]();
     });
 
-    waitFor(() => {
+    await waitFor(() => {
       return expect(directoryState === result.current[0]).toBe(false);
     });
   });
