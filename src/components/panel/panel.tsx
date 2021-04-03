@@ -84,10 +84,12 @@ export const Panel = ({ isFocused, onFocus, panelRef }: PanelProps) => {
   }
 
   useEffect(() => {
-    currentElementRef.current?.scrollIntoView({
-      block: 'nearest',
-    });
-  }, [selected]);
+    if (isFocused) {
+      currentElementRef.current?.scrollIntoView({
+        block: 'nearest',
+      });
+    }
+  }, [selected, isFocused]);
 
   return (
     <div className="h-full w-full overflow-hidden panel">
