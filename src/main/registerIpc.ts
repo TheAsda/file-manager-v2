@@ -1,6 +1,6 @@
 import { ipcMain } from 'electron-better-ipc';
 import { error } from 'electron-log';
-import { readdir } from 'fs-extra';
+import { readdir, createFile, mkdirp, rename } from 'fs-extra';
 import { join } from 'path';
 import { FileInfoSerializable } from '../types/file-info';
 import { getFileInfo } from '../utils/getFileInfo';
@@ -9,6 +9,10 @@ export function registerIpc() {
   ipcMain.answerRenderer(
     'get-directory',
     async (path: string): Promise<FileInfoSerializable[]> => {
+      if (!path) {
+        throw new Error('Data is not specified');
+      }
+
       try {
         const data = await readdir(path);
         const files = data.map((item) => ({
@@ -26,6 +30,54 @@ export function registerIpc() {
       } catch (err) {
         error(err);
         return [];
+      }
+    }
+  );
+
+  ipcMain.answerRenderer(
+    'create-file',
+    async (data: { path: string; name: string }) => {
+      if (!data) {
+        throw new Error('Data is not specified');
+      }
+
+      try {
+        await createFile(join(data.path, data.name));
+      } catch (err) {
+        error(err);
+        throw new Error('Cannot create file');
+      }
+    }
+  );
+
+  ipcMain.answerRenderer(
+    'create-folder',
+    async (data: { path: string; name: string }) => {
+      if (!data) {
+        throw new Error('Data is not specified');
+      }
+
+      try {
+        await mkdirp(join(data.path, data.name));
+      } catch (err) {
+        error(err);
+        throw new Error('Cannot create folder');
+      }
+    }
+  );
+
+  ipcMain.answerRenderer(
+    'rename',
+    async (data: { oldPath: string; newPath: string }) => {
+      if (!data) {
+        throw new Error('Data is not provided');
+      }
+
+      try {
+        await rename(data.oldPath, data.newPath);
+      } catch (err) {
+        error(err);
+        throw new Error('Cannot rename file');
       }
     }
   );

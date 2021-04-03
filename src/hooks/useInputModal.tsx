@@ -10,7 +10,7 @@ import { useHotkeys } from 'react-hotkeys-hook';
 import { useKeyMap } from './useKeyMap';
 import { InputModal } from '../components/input-modal/input-modal';
 
-export type OnComplete = (value: string) => void;
+export type OnComplete = (value: string) => void | Promise<void>;
 export type OpenInputModal = (data: {
   title: string;
   onComplete: OnComplete;

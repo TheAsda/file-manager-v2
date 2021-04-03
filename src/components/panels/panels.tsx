@@ -1,6 +1,3 @@
-import { error } from 'electron-log';
-import { createFile } from 'fs-extra';
-import { join } from 'path';
 import React, { useMemo, useRef, useState } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
 import { ReflexContainer, ReflexElement, ReflexSplitter } from 'react-reflex';
@@ -10,6 +7,7 @@ import { StatusBar } from '../status-bar/status-bar';
 import { Command } from '../../types/command';
 import { useRegisterCommands } from '../../hooks/useCommands';
 import { useInputModal } from '../../hooks/useInputModal';
+import { createFile, createFolder } from '../../utils/fsActions';
 
 export const Panels = () => {
   const { switchPanel } = useKeyMap();
@@ -48,12 +46,9 @@ export const Panels = () => {
 
           openInputModal({
             title: 'New file',
-            onComplete: (value) => {
-              createFile(join(path, value))
-                .then(() => {
-                  return updateDirectory();
-                })
-                .catch(error);
+            onComplete: async (value) => {
+              await createFile(value, path);
+              updateDirectory();
             },
             elementToFocus: currentElement,
           });
@@ -62,7 +57,23 @@ export const Panels = () => {
       {
         name: 'New folder',
         handler: () => {
-          openInputModal({ title: 'New folder', onComplete: () => {} });
+          if (currentPanelRef.current === undefined) {
+            return;
+          }
+          const {
+            path,
+            updateDirectory,
+            currentElement,
+          } = currentPanelRef.current;
+
+          openInputModal({
+            title: 'New folder',
+            onComplete: async (value) => {
+              await createFolder(value, path);
+              updateDirectory();
+            },
+            elementToFocus: currentElement,
+          });
         },
       },
       {
