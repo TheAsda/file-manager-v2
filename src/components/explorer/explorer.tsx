@@ -60,7 +60,7 @@ export const Explorer = (props: ExplorerProps) => {
               selected={i === props.selected}
               onSelect={() => props.onSelect(i)}
               onActivate={() => props.onActivate(i)}
-              ref={props.currentElementRef}
+              ref={i === props.selected ? props.currentElementRef : undefined}
             />
           ))}
         </div>
