@@ -1,5 +1,5 @@
 import { warn } from 'electron-log';
-import React, { MutableRefObject, useMemo, useRef, useState } from 'react';
+import React, { MutableRefObject, useEffect, useMemo, useRef } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
 import { useDirectory } from '../../hooks/useDirectory';
 import { useKeyMap } from '../../hooks/useKeyMap';
@@ -82,6 +82,12 @@ export const Panel = ({ isFocused, onFocus, panelRef }: PanelProps) => {
           : undefined,
     };
   }
+
+  useEffect(() => {
+    currentElementRef.current?.scrollIntoView({
+      block: 'nearest',
+    });
+  }, [selected]);
 
   return (
     <div className="h-full w-full overflow-hidden panel">
