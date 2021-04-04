@@ -5,7 +5,7 @@ import { useColumns } from './useColumns';
 import { FileInfo } from '../../types/file-info';
 import { ExplorerRow } from './explorer-row';
 import { ExplorerHeader } from './explorer-header';
-import { ExplorerInput } from './explorer-input';
+import { ExplorerInputRow } from './explorer-input-row';
 
 export interface ExplorerProps {
   data: FileInfo[];
@@ -76,7 +76,7 @@ export const Explorer = (props: ExplorerProps) => {
           {props.data.map((item, i) => {
             if (i === props.editable) {
               return (
-                <ExplorerInput
+                <ExplorerInputRow
                   sizes={columnsSizes}
                   key={item.name}
                   data={item}

@@ -10,7 +10,7 @@ export interface ExplorerInputProps extends ExplorerRowProps {
   onCancel: () => void;
 }
 
-export const ExplorerInput = forwardRef<HTMLDivElement, ExplorerInputProps>(
+export const ExplorerInputRow = forwardRef<HTMLDivElement, ExplorerInputProps>(
   (props, ref) => {
     if (props.sizes.length !== props.columns.length) {
       throw new Error('Sizes count are not equal to columns count');
