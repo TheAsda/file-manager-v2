@@ -1,6 +1,7 @@
 import { warn } from 'electron-log';
 import React, { MutableRefObject, useEffect, useMemo, useRef } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
+import { join } from 'path';
 import { useDirectory } from '../../hooks/useDirectory';
 import { useKeyMap } from '../../hooks/useKeyMap';
 import { usePath } from '../../hooks/usePath';
@@ -23,12 +24,12 @@ export interface PanelProps {
 }
 
 export const Panel = ({ isFocused, onFocus, panelRef }: PanelProps) => {
-  const initPath = useMemo(() => process.cwd(), []);
+  const initPath = useMemo(() => join(process.cwd(), 'tmp'), []);
   const [path, pathDispatch] = usePath(initPath);
 
   const currentElementRef = useRef<HTMLDivElement>(null);
   const { up, down, back, activate } = useKeyMap();
-  const [data] = useDirectory(path);
+  const [data, updateDirectory] = useDirectory(path);
 
   const [selected, selectedDispatch] = useSelected(data.length);
 
@@ -53,7 +54,9 @@ export const Panel = ({ isFocused, onFocus, panelRef }: PanelProps) => {
           pathDispatch({ type: 'exit' });
           break;
         case activate:
-          pathDispatch({ type: 'enter', name: data[selected].name });
+          if (data[selected].isDirectory) {
+            pathDispatch({ type: 'enter', name: data[selected].name });
+          }
           break;
         default:
           warn('Unknown hotkeys key');
@@ -74,7 +77,7 @@ export const Panel = ({ isFocused, onFocus, panelRef }: PanelProps) => {
   if (panelRef !== undefined) {
     panelRef.current = {
       path,
-      updateDirectory: () => {},
+      updateDirectory,
       currentItem: data[selected],
       currentElement:
         currentElementRef.current !== null
@@ -93,7 +96,7 @@ export const Panel = ({ isFocused, onFocus, panelRef }: PanelProps) => {
 
   return (
     <div className="h-full w-full overflow-hidden panel">
-      <PathLine path={path} />
+      <PathLine path={path} onRefresh={updateDirectory} />
       <div className="w-full overflow-hidden bg-gray-800">
         <Explorer
           data={data}
