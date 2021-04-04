@@ -45,11 +45,11 @@ export const Explorer = (props: ExplorerProps) => {
 
   return (
     <div
-      className="flex flex-col flex-grow h-full bg-gray-900 text-white m-1"
+      className="flex flex-col flex-grow h-full bg-gray-900 text-white p-1"
       ref={ref}
     >
       <ExplorerHeader columns={columns} sizes={columnsSizes} />
-      <div className="flex-grow bg-gray-900 explorer-content overflow-x-overlay">
+      <div className="flex-grow bg-gray-900 explorer-content overflow-y-overlay">
         <div className="w-full">
           {props.data.map((item, i) => (
             <ExplorerRow

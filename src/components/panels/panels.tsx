@@ -3,7 +3,6 @@ import { useHotkeys } from 'react-hotkeys-hook';
 import { ReflexContainer, ReflexElement, ReflexSplitter } from 'react-reflex';
 import { useKeyMap } from '../../hooks/useKeyMap';
 import { Panel, PanelRef } from '../panel/panel';
-import { StatusBar } from '../status-bar/status-bar';
 import { Command } from '../../types/command';
 import { useRegisterCommands } from '../../hooks/useCommands';
 import { useInputModal } from '../../hooks/useInputModal';
@@ -86,27 +85,22 @@ export const Panels = () => {
   useRegisterCommands('panels', commands);
 
   return (
-    <div className="h-screen w-screen panels">
-      <ReflexContainer orientation="vertical" className="panels-content">
-        <ReflexElement className="h-full overflow-hidden">
-          <Panel
-            panelRef={leftPanelRef}
-            isFocused={focusedPanel === 'left'}
-            onFocus={() => setFocusedPanel('left')}
-          />
-        </ReflexElement>
-        <ReflexSplitter />
-        <ReflexElement className="h-full overflow-hidden">
-          <Panel
-            panelRef={rightPanelRef}
-            isFocused={focusedPanel === 'right'}
-            onFocus={() => setFocusedPanel('right')}
-          />
-        </ReflexElement>
-      </ReflexContainer>
-      <div className="panels-status-bar">
-        <StatusBar />
-      </div>
-    </div>
+    <ReflexContainer orientation="vertical">
+      <ReflexElement className="h-full overflow-hidden">
+        <Panel
+          panelRef={leftPanelRef}
+          isFocused={focusedPanel === 'left'}
+          onFocus={() => setFocusedPanel('left')}
+        />
+      </ReflexElement>
+      <ReflexSplitter />
+      <ReflexElement className="h-full overflow-hidden">
+        <Panel
+          panelRef={rightPanelRef}
+          isFocused={focusedPanel === 'right'}
+          onFocus={() => setFocusedPanel('right')}
+        />
+      </ReflexElement>
+    </ReflexContainer>
   );
 };
