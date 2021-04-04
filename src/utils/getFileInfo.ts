@@ -1,11 +1,12 @@
 import { stat } from 'fs-extra';
+import { join } from 'path';
 import { FileInfoSerializable } from '../types/file-info';
 
 export async function getFileInfo(
   item: FileInfoSerializable
 ): Promise<FileInfoSerializable> {
   try {
-    const data = await stat(item.path);
+    const data = await stat(join(item.path, item.name));
 
     return {
       ...item,

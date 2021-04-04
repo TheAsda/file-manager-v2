@@ -10,8 +10,8 @@ export const createFolder = async (name: string, path: string) => {
 };
 
 export const rename = async (
-  oldName: string,
   newName: string,
+  oldName: string,
   path: string
 ) => {
   await ipcRenderer.callMain('rename', {

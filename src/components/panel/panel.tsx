@@ -1,5 +1,11 @@
 import { warn } from 'electron-log';
-import React, { MutableRefObject, useEffect, useMemo, useRef } from 'react';
+import React, {
+  MutableRefObject,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
 import { join } from 'path';
 import { useDirectory } from '../../hooks/useDirectory';
@@ -15,28 +21,37 @@ export interface PanelRef {
   currentItem: FileInfo;
   currentElement?: HTMLElement;
   updateDirectory: () => void;
+  startRename: () => void;
 }
 
 export interface PanelProps {
   isFocused: boolean;
   onFocus: () => void;
   panelRef?: MutableRefObject<PanelRef | undefined>;
+  onRename: (newName: string, oldName: string, path: string) => void;
 }
 
-export const Panel = ({ isFocused, onFocus, panelRef }: PanelProps) => {
+export const Panel = ({
+  isFocused,
+  onFocus,
+  panelRef,
+  onRename,
+}: PanelProps) => {
   const initPath = useMemo(() => join(process.cwd(), 'tmp'), []);
   const [path, pathDispatch] = usePath(initPath);
 
   const currentElementRef = useRef<HTMLDivElement>(null);
-  const { up, down, back, activate } = useKeyMap();
+  const { up, down, back, activate, rename } = useKeyMap();
   const [data, updateDirectory] = useDirectory(path);
+  const [editable, setEditable] = useState<number | null>(null);
 
   const [selected, selectedDispatch] = useSelected(data.length);
 
-  const keys = useMemo(() => [down, up, back, activate].join(','), [
+  const keys = useMemo(() => [down, up, back, activate, rename].join(','), [
     activate,
     back,
     down,
+    rename,
     up,
   ]);
 
@@ -58,12 +73,15 @@ export const Panel = ({ isFocused, onFocus, panelRef }: PanelProps) => {
             pathDispatch({ type: 'enter', name: data[selected].name });
           }
           break;
+        case rename:
+          setEditable(selected);
+          break;
         default:
           warn('Unknown hotkeys key');
       }
     },
     { enabled: isFocused },
-    [down, up, back, activate, data, selected]
+    [down, up, back, activate, data, selected, rename]
   );
 
   const onSelect = (index: number) => {
@@ -83,6 +101,7 @@ export const Panel = ({ isFocused, onFocus, panelRef }: PanelProps) => {
         currentElementRef.current !== null
           ? currentElementRef.current
           : undefined,
+      startRename: () => setEditable(selected),
     };
   }
 
@@ -106,8 +125,16 @@ export const Panel = ({ isFocused, onFocus, panelRef }: PanelProps) => {
             data[index].isDirectory &&
             pathDispatch({ type: 'enter', name: data[index].name })
           }
-          editable={null}
+          editable={editable}
           currentElementRef={currentElementRef}
+          onEditCancel={() => setEditable(null)}
+          onEditComplete={(value) => {
+            if (editable === null) {
+              return;
+            }
+            onRename(value, data[editable].name, data[editable].path);
+            setEditable(null);
+          }}
         />
       </div>
     </div>

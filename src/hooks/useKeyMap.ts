@@ -3,15 +3,17 @@ import hotkeys from 'hotkeys-js';
 import { Shortcut, Shortcuts } from '../types/shortcuts';
 
 export const useKeyMap = (): Record<Shortcut, string> => {
-  const shortcuts: Shortcuts = useMemo(
-    () => ({
-      up: 'up',
-      down: 'down',
-      openCommandPalette: ['ctrl+shift+p', 'f1'],
-      back: 'backspace',
-      activate: 'enter',
-      switchPanel: 'tab',
-    }),
+  const shortcuts = useMemo(
+    () =>
+      ({
+        up: 'up',
+        down: 'down',
+        openCommandPalette: ['ctrl+shift+p', 'f1'],
+        back: 'backspace',
+        activate: 'enter',
+        switchPanel: 'tab',
+        rename: 'f2',
+      } as Shortcuts),
     []
   );
 

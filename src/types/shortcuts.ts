@@ -4,6 +4,7 @@ export type Shortcut =
   | 'openCommandPalette'
   | 'back'
   | 'activate'
-  | 'switchPanel';
+  | 'switchPanel'
+  | 'rename';
 
 export type Shortcuts = Record<Shortcut, string | string[]>;

@@ -6,7 +6,7 @@ import { Panel, PanelRef } from '../panel/panel';
 import { Command } from '../../types/command';
 import { useRegisterCommands } from '../../hooks/useCommands';
 import { useInputModal } from '../../hooks/useInputModal';
-import { createFile, createFolder } from '../../utils/fsActions';
+import { createFile, createFolder, rename } from '../../utils/fsActions';
 
 export const Panels = () => {
   const { switchPanel } = useKeyMap();
@@ -25,6 +25,11 @@ export const Panels = () => {
 
       return s === 'left' ? 'right' : 'left';
     });
+  };
+
+  const onRename = async (newName: string, oldName: string, path: string) => {
+    await rename(newName, oldName, path);
+    currentPanelRef.current?.updateDirectory?.();
   };
 
   useHotkeys(switchPanel, togglePanel, { enabled: !isOpened });
@@ -77,7 +82,14 @@ export const Panels = () => {
       },
       {
         name: 'Rename',
-        handler: () => {},
+        handler: () => {
+          if (currentPanelRef.current === undefined) {
+            return;
+          }
+          const { startRename } = currentPanelRef.current;
+
+          startRename();
+        },
       },
     ] as Command[];
   }, [currentPanelRef, openInputModal]);
@@ -91,6 +103,7 @@ export const Panels = () => {
           panelRef={leftPanelRef}
           isFocused={focusedPanel === 'left'}
           onFocus={() => setFocusedPanel('left')}
+          onRename={onRename}
         />
       </ReflexElement>
       <ReflexSplitter />
@@ -99,6 +112,7 @@ export const Panels = () => {
           panelRef={rightPanelRef}
           isFocused={focusedPanel === 'right'}
           onFocus={() => setFocusedPanel('right')}
+          onRename={onRename}
         />
       </ReflexElement>
     </ReflexContainer>

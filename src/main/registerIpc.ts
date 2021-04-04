@@ -17,7 +17,7 @@ export function registerIpc() {
         const data = await readdir(path);
         const files = data.map((item) => ({
           name: item,
-          path: join(path, item),
+          path,
         }));
 
         const chunk: Promise<FileInfoSerializable>[] = [];
