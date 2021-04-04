@@ -11,14 +11,14 @@ import { join } from 'path';
 import { useDirectory } from '../../hooks/useDirectory';
 import { useKeyMap } from '../../hooks/useKeyMap';
 import { usePath } from '../../hooks/usePath';
-import { useSelected } from '../../hooks/useSelected';
 import { Explorer } from '../explorer/explorer';
 import { PathLine } from '../path-line/path-line';
 import { FileInfo } from '../../types/file-info';
+import { useMultipleSelected } from '../../hooks/useMultipleSelected';
 
 export interface PanelRef {
   path: string;
-  currentItem: FileInfo;
+  currentItems: FileInfo[];
   currentElement?: HTMLElement;
   updateDirectory: () => void;
   startRename: () => void;
@@ -41,40 +41,63 @@ export const Panel = ({
   const [path, pathDispatch] = usePath(initPath);
 
   const currentElementRef = useRef<HTMLDivElement>(null);
-  const { up, down, back, activate, rename } = useKeyMap();
+  const {
+    up,
+    down,
+    back,
+    activate,
+    rename,
+    selectMultipleNext,
+    selectMultiplePrev,
+  } = useKeyMap();
   const [data, updateDirectory] = useDirectory(path);
   const [editable, setEditable] = useState<number | null>(null);
 
-  const [selected, selectedDispatch] = useSelected(data.length);
+  const [selected, lastSelected, selectedDispatch] = useMultipleSelected(
+    data.length
+  );
 
-  const keys = useMemo(() => [down, up, back, activate, rename].join(','), [
-    activate,
-    back,
-    down,
-    rename,
-    up,
-  ]);
+  const keys = useMemo(
+    () =>
+      [
+        down,
+        up,
+        back,
+        activate,
+        rename,
+        selectMultipleNext,
+        selectMultiplePrev,
+      ].join(','),
+    [activate, back, down, rename, up, selectMultipleNext, selectMultiplePrev]
+  );
 
   useHotkeys(
     keys,
     (_, handler) => {
       switch (handler.key) {
         case down:
-          selectedDispatch({ type: 'increase' });
+          selectedDispatch({ type: 'select-next' });
+          break;
+        case selectMultipleNext:
+          selectedDispatch({ type: 'select-next', include: true });
           break;
         case up:
-          selectedDispatch({ type: 'decrease' });
+          selectedDispatch({ type: 'select-prev' });
+          break;
+        case selectMultiplePrev:
+          selectedDispatch({ type: 'select-prev', include: true });
           break;
         case back:
           pathDispatch({ type: 'exit' });
           break;
         case activate:
-          if (data[selected].isDirectory) {
-            pathDispatch({ type: 'enter', name: data[selected].name });
+          if (data[lastSelected].isDirectory) {
+            pathDispatch({ type: 'enter', name: data[lastSelected].name });
           }
           break;
         case rename:
-          setEditable(selected);
+          setEditable(lastSelected);
+          selectedDispatch({ type: 'reset', index: lastSelected });
           break;
         default:
           warn('Unknown hotkeys key');
@@ -96,12 +119,15 @@ export const Panel = ({
     panelRef.current = {
       path,
       updateDirectory,
-      currentItem: data[selected],
+      currentItems: selected.map((i) => data[i]),
       currentElement:
         currentElementRef.current !== null
           ? currentElementRef.current
           : undefined,
-      startRename: () => setEditable(selected),
+      startRename: () => {
+        selectedDispatch({ type: 'reset', index: lastSelected });
+        setEditable(lastSelected);
+      },
     };
   }
 
@@ -119,7 +145,8 @@ export const Panel = ({
       <div className="w-full overflow-hidden bg-gray-800">
         <Explorer
           data={data}
-          selected={isFocused ? selected : null}
+          selected={isFocused ? selected : []}
+          lastSelected={lastSelected}
           onSelect={onSelect}
           onActivate={(index) =>
             data[index].isDirectory &&

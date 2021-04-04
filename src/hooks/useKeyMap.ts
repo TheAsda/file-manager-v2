@@ -13,6 +13,8 @@ export const useKeyMap = (): Record<Shortcut, string> => {
         activate: 'enter',
         switchPanel: 'tab',
         rename: 'f2',
+        selectMultipleNext: 'shift+down',
+        selectMultiplePrev: 'shift+up',
       } as Shortcuts),
     []
   );

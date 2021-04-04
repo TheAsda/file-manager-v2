@@ -5,6 +5,11 @@ export type Shortcut =
   | 'back'
   | 'activate'
   | 'switchPanel'
-  | 'rename';
+  | 'rename'
+  | 'selectMultipleNext'
+  | 'selectMultiplePrev'
+  | 'delete'
+  | 'deletePermanently'
+  | 'move';
 
 export type Shortcuts = Record<Shortcut, string | string[]>;

@@ -23,6 +23,13 @@ export const Panels = () => {
     focusedPanel === 'left' ? leftPanelRef : rightPanelRef;
   const otherPanelRef = focusedPanel === 'left' ? rightPanelRef : leftPanelRef;
 
+  const updateDirectory = () => {
+    currentPanelRef.current?.updateDirectory?.();
+    if (currentPanelRef.current?.path === otherPanelRef.current?.path) {
+      otherPanelRef.current?.updateDirectory?.();
+    }
+  };
+
   const togglePanel = () => {
     setFocusedPanel((s) => {
       otherPanelRef.current?.currentElement?.focus();
@@ -48,11 +55,7 @@ export const Panels = () => {
           if (currentPanelRef.current === undefined) {
             return;
           }
-          const {
-            path,
-            updateDirectory,
-            currentElement,
-          } = currentPanelRef.current;
+          const { path, currentElement } = currentPanelRef.current;
 
           openInputModal({
             title: 'New file',
@@ -70,11 +73,7 @@ export const Panels = () => {
           if (currentPanelRef.current === undefined) {
             return;
           }
-          const {
-            path,
-            updateDirectory,
-            currentElement,
-          } = currentPanelRef.current;
+          const { path, currentElement } = currentPanelRef.current;
 
           openInputModal({
             title: 'New folder',
@@ -103,25 +102,41 @@ export const Panels = () => {
           if (currentPanelRef.current === undefined) {
             return;
           }
-          const {
-            currentItem,
-            currentElement,
-            updateDirectory,
-          } = currentPanelRef.current;
-          const path = join(currentItem.path, currentItem.name);
+          const { currentItems, currentElement } = currentPanelRef.current;
 
-          openConfirmDialog({
-            title: 'Are you sure you want to delete this item?',
-            onOk: async () => {
-              try {
-                await trash(path);
-                updateDirectory();
-              } catch (err) {
-                error(err);
-              }
-            },
-            elementToFocus: currentElement,
-          });
+          if (currentItems.length === 0) {
+            const path = join(currentItems[0].path, currentItems[0].name);
+
+            openConfirmDialog({
+              title: 'Are you sure you want to delete this item?',
+              onOk: async () => {
+                try {
+                  await trash(path);
+                  updateDirectory();
+                } catch (err) {
+                  error(err);
+                }
+              },
+              elementToFocus: currentElement,
+            });
+          } else {
+            const paths = currentItems.map((item) =>
+              join(item.path, item.name)
+            );
+
+            openConfirmDialog({
+              title: `Are you sure you want to delete ${paths.length} items`,
+              onOk: async () => {
+                try {
+                  await Promise.all(paths.map((path) => trash(path)));
+                  updateDirectory();
+                } catch (err) {
+                  error(err);
+                }
+              },
+              elementToFocus: currentElement,
+            });
+          }
         },
       },
     ] as Command[];

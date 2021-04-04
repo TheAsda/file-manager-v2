@@ -9,7 +9,8 @@ import { ExplorerInputRow } from './explorer-input-row';
 
 export interface ExplorerProps {
   data: FileInfo[];
-  selected: number | null;
+  selected: number[];
+  lastSelected: number;
   onSelect: (index: number) => void;
   onActivate: (index: number) => void;
   editable: number | null;
@@ -74,6 +75,8 @@ export const Explorer = (props: ExplorerProps) => {
       <div className="flex-grow bg-gray-900 explorer-content overflow-y-overlay">
         <div className="w-full">
           {props.data.map((item, i) => {
+            const isSelected = props.selected.includes(i);
+            const isLastSelected = i === props.lastSelected;
             if (i === props.editable) {
               return (
                 <ExplorerInputRow
@@ -81,12 +84,10 @@ export const Explorer = (props: ExplorerProps) => {
                   key={item.name}
                   data={item}
                   columns={columns}
-                  selected={i === props.selected}
+                  selected={isSelected}
                   onSelect={() => props.onSelect(i)}
                   onActivate={() => props.onActivate(i)}
-                  ref={
-                    i === props.selected ? props.currentElementRef : undefined
-                  }
+                  ref={isLastSelected ? props.currentElementRef : undefined}
                   onChange={setInputValue}
                   value={inputValue}
                   onCancel={props.onEditCancel}
@@ -100,10 +101,10 @@ export const Explorer = (props: ExplorerProps) => {
                 key={item.name}
                 data={item}
                 columns={columns}
-                selected={i === props.selected}
+                selected={isSelected}
                 onSelect={() => props.onSelect(i)}
                 onActivate={() => props.onActivate(i)}
-                ref={i === props.selected ? props.currentElementRef : undefined}
+                ref={isLastSelected ? props.currentElementRef : undefined}
               />
             );
           })}
