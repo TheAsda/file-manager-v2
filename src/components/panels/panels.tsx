@@ -10,7 +10,7 @@ import { createFile, createFolder, rename } from '../../utils/fsActions';
 
 export const Panels = () => {
   const { switchPanel } = useKeyMap();
-  const { openInputModal, isOpened } = useInputModal();
+  const { openInputModal, isOpen } = useInputModal();
   const [focusedPanel, setFocusedPanel] = useState<'left' | 'right'>('left');
   const leftPanelRef = useRef<PanelRef>();
   const rightPanelRef = useRef<PanelRef>();
@@ -32,7 +32,7 @@ export const Panels = () => {
     currentPanelRef.current?.updateDirectory?.();
   };
 
-  useHotkeys(switchPanel, togglePanel, { enabled: !isOpened });
+  useHotkeys(switchPanel, togglePanel, { enabled: !isOpen });
 
   const commands = useMemo(() => {
     return [

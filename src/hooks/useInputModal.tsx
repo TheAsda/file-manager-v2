@@ -9,6 +9,8 @@ import React, {
 import { useHotkeys } from 'react-hotkeys-hook';
 import { useKeyMap } from './useKeyMap';
 import { InputModal } from '../components/input-modal/input-modal';
+import { ContextError } from '../exceptions/hook';
+import { UnknownActionTypeError } from '../exceptions/reducer';
 
 export type OnComplete = (value: string) => void | Promise<void>;
 export type OpenInputModal = (data: {
@@ -20,7 +22,7 @@ export type OpenInputModal = (data: {
 
 interface InputModalStorage {
   openInputModal: OpenInputModal;
-  isOpened: boolean;
+  isOpen: boolean;
 }
 
 const InputModalContext = createContext<InputModalStorage | undefined>(
@@ -29,7 +31,7 @@ const InputModalContext = createContext<InputModalStorage | undefined>(
 
 interface InputModalState {
   isOpen: boolean;
-  onComplete?: null | OnComplete;
+  onComplete?: OnComplete;
   title?: string;
 }
 
@@ -61,7 +63,7 @@ const reducer = (
         title: undefined,
       };
     default:
-      throw new Error('Unknown action type');
+      throw new UnknownActionTypeError();
   }
 };
 
@@ -105,11 +107,8 @@ export const InputModalProvider = ({
   };
 
   const onOk = () => {
-    if (!state.onComplete) {
-      return;
-    }
+    state.onComplete?.(inputValue);
 
-    state.onComplete(inputValue);
     closeInputModal();
   };
 
@@ -122,7 +121,7 @@ export const InputModalProvider = ({
 
   return (
     <InputModalContext.Provider
-      value={{ openInputModal, isOpened: state.isOpen }}
+      value={{ openInputModal, isOpen: state.isOpen }}
     >
       {children}
       <InputModal
@@ -141,7 +140,7 @@ export const useInputModal = () => {
   const context = useContext(InputModalContext);
 
   if (context === undefined) {
-    throw new Error('useInputModal must be inside provider');
+    throw new ContextError('useInputModal');
   }
 
   return context;
