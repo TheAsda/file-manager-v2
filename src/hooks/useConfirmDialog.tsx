@@ -1,11 +1,15 @@
 import React, {
   createContext,
   PropsWithChildren,
+  useContext,
   useReducer,
   useRef,
 } from 'react';
+import { useHotkeys } from 'react-hotkeys-hook';
 import { ConfirmModal } from '../components/confirm-modal/confirm-modal';
+import { ContextError } from '../exceptions/hook';
 import { UnknownActionTypeError } from '../exceptions/reducer';
+import { useKeyMap } from './useKeyMap';
 
 export type OpenConfirmDialog = (data: {
   title: string;
@@ -68,6 +72,7 @@ const reducer = (
 export const ConfirmModalProvider = ({
   children,
 }: PropsWithChildren<unknown>) => {
+  const { activate } = useKeyMap();
   const prevRef = useRef<HTMLElement | null>(null);
   const [state, dispatch] = useReducer(reducer, {
     isOpen: false,
@@ -111,15 +116,34 @@ export const ConfirmModalProvider = ({
     closeConfirmModal();
   };
 
-  <ConfirmDialogContext.Provider
-    value={{ isOpen: state.isOpen, openConfirmDialog }}
-  >
-    {children}
-    <ConfirmModal
-      isOpen={state.isOpen}
-      onOk={onOk}
-      onClose={onCancel}
-      title={state.title}
-    />
-  </ConfirmDialogContext.Provider>;
+  useHotkeys(
+    activate,
+    onOk,
+    { enabled: state.isOpen, enableOnTags: ['INPUT'] },
+    [state.onOk]
+  );
+
+  return (
+    <ConfirmDialogContext.Provider
+      value={{ isOpen: state.isOpen, openConfirmDialog }}
+    >
+      {children}
+      <ConfirmModal
+        isOpen={state.isOpen}
+        onOk={onOk}
+        onClose={onCancel}
+        title={state.title}
+      />
+    </ConfirmDialogContext.Provider>
+  );
+};
+
+export const useConfirmDialog = () => {
+  const context = useContext(ConfirmDialogContext);
+
+  if (context === undefined) {
+    throw new ContextError('useConfirmDialog');
+  }
+
+  return context;
 };

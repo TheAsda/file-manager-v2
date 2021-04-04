@@ -273,7 +273,8 @@
     "react-router-dom": "^5.2.0",
     "react-use": "^17.1.1",
     "regenerator-runtime": "^0.13.5",
-    "source-map-support": "^0.5.19"
+    "source-map-support": "^0.5.19",
+    "trash": "^7.1.1"
   },
   "devEngines": {
     "node": ">=10.x",

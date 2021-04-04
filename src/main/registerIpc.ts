@@ -2,6 +2,7 @@ import { ipcMain } from 'electron-better-ipc';
 import { error } from 'electron-log';
 import { readdir, createFile, mkdirp, rename } from 'fs-extra';
 import { join } from 'path';
+import trash from 'trash';
 import { FileInfoSerializable } from '../types/file-info';
 import { getFileInfo } from '../utils/getFileInfo';
 
@@ -81,4 +82,17 @@ export function registerIpc() {
       }
     }
   );
+
+  ipcMain.answerRenderer('trash', async (path: string) => {
+    if (!path) {
+      throw new Error('Path is not specified');
+    }
+
+    try {
+      await trash(path);
+    } catch (err) {
+      error(err);
+      throw new Error('Cannot trash path');
+    }
+  });
 }

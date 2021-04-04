@@ -19,3 +19,7 @@ export const rename = async (
     newPath: join(path, newName),
   });
 };
+
+export const trash = async (path: string) => {
+  await ipcRenderer.callMain('trash', path);
+};

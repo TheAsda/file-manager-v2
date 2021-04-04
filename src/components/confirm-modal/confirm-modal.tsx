@@ -24,11 +24,20 @@ export const ConfirmModal = (props: ConfirmModalProps) => {
         className="bg-gray-700 p-3 flex flex-col items-stretch gap-2 rounded-md"
       >
         <h1 className="text-white">{props.title}</h1>
-        <div className="flex gap-2 items-center">
-          <button type="button" onClick={props.onClose}>
+        <div className="flex gap-2 items-center justify-end">
+          <button
+            type="button"
+            onClick={props.onClose}
+            className="bg-gray-600 p-1 rounded-md text-white"
+          >
             Cancel
           </button>
-          <button type="submit" onClick={props.onOk}>
+          <button
+            ref={okRef}
+            type="submit"
+            onClick={props.onOk}
+            className="bg-gray-600 p-1 rounded-md text-white"
+          >
             Ok
           </button>
         </div>

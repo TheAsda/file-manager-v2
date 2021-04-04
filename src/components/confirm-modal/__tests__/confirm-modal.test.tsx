@@ -6,7 +6,7 @@ import { ConfirmModal } from '../confirm-modal';
 const onOkMock = jest.fn();
 const onCloseMock = jest.fn();
 
-describe('ConfirmPopup', () => {
+describe('ConfirmModal', () => {
   beforeEach(() => {
     onOkMock.mockReset();
     onCloseMock.mockReset();
