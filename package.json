@@ -264,6 +264,7 @@
     "electron-log": "^4.2.4",
     "electron-updater": "^4.3.4",
     "fs-extra": "^9.1.0",
+    "fuse.js": "^6.4.6",
     "history": "^5.0.0",
     "hotkeys-js": "^3.8.3",
     "react": "^17.0.1",

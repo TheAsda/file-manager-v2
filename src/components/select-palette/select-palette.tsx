@@ -1,5 +1,6 @@
 import { warn } from 'electron-log';
-import React, { useEffect, useMemo, useRef } from 'react';
+import Fuse from 'fuse.js';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
 import { useKeyMap } from '../../hooks/useKeyMap';
 import { useSelected } from '../../hooks/useSelected';
@@ -18,6 +19,7 @@ export const SelectPalette = (props: SelectPaletteProps) => {
   const inputRef = useRef<HTMLInputElement>(null);
   const { up, down, activate } = useKeyMap();
   const [selected, dispatch] = useSelected(props.options.length);
+  const [inputValue, setInputValue] = useState('');
 
   const keys = useMemo(() => [up, down, activate].join(','), [
     activate,
@@ -68,12 +70,23 @@ export const SelectPalette = (props: SelectPaletteProps) => {
     }
   }, [props.isOpen]);
 
+  const fuse = useMemo(() => new Fuse(props.options, { includeScore: true }), [
+    props.options,
+  ]);
+
+  const results =
+    inputValue.trim().length !== 0
+      ? fuse.search(inputValue).map((opt) => opt.item)
+      : props.options;
+
   return (
     <Modal isOpen={props.isOpen} onClose={props.onClose}>
       <div className="bg-gray-700 p-2 flex flex-col gap-1">
         <input
           type="text"
           ref={inputRef}
+          value={inputValue}
+          onChange={(e) => setInputValue(e.target.value)}
           onKeyDownCapture={(e) => {
             if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
               e.preventDefault();
@@ -81,7 +94,7 @@ export const SelectPalette = (props: SelectPaletteProps) => {
           }}
         />
         <ul>
-          {props.options.map((opt, i) => (
+          {results.map((opt, i) => (
             <SelectPaletteItem
               value={opt}
               selected={props.isOpen && selected === i}
