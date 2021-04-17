@@ -1,15 +1,16 @@
 import React from 'react';
 import { ArrowUpIcon, ArrowDownIcon } from '@radix-ui/react-icons';
 import { ExplorerCellProps, ExplorerCell } from './explorer-cell';
-
-export type SortType = 'asc' | 'desc';
+import { SortDirection } from './useColumns';
 
 export interface ExplorerHeaderCellProps extends ExplorerCellProps {
-  sort?: SortType;
+  sort?: SortDirection;
+  onSort?: () => void;
 }
 
 export const ExplorerHeaderCell = ({
   sort,
+  onSort,
   ...props
 }: ExplorerHeaderCellProps) => {
   let icon = null;
@@ -26,7 +27,7 @@ export const ExplorerHeaderCell = ({
   }
 
   return (
-    <ExplorerCell {...props}>
+    <ExplorerCell {...props} onClick={onSort}>
       {props.children}
       {icon}
     </ExplorerCell>

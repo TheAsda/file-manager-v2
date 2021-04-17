@@ -1,14 +1,19 @@
 import React from 'react';
 import { FileInfo } from '../../types/file-info';
-import { Column } from './useColumns';
-import { ExplorerCell } from './explorer-cell';
+import { Column, ColumnKey } from './useColumns';
+import { ExplorerHeaderCell } from './explorer-header-cell';
 
 export interface ExplorerHeaderProps {
   columns: Column<FileInfo>[];
   sizes: number[];
+  onSort: (key: ColumnKey) => void;
 }
 
-export const ExplorerHeader = ({ columns, sizes }: ExplorerHeaderProps) => {
+export const ExplorerHeader = ({
+  columns,
+  sizes,
+  onSort,
+}: ExplorerHeaderProps) => {
   if (columns.length !== sizes.length) {
     throw new Error('Sizes count are not equal to columns count');
   }
@@ -21,9 +26,14 @@ export const ExplorerHeader = ({ columns, sizes }: ExplorerHeaderProps) => {
       }}
     >
       {columns.map((col) => (
-        <ExplorerCell className="font-bold" key={col.header}>
+        <ExplorerHeaderCell
+          className="font-bold"
+          key={col.header}
+          sort={col.sort}
+          onSort={() => onSort(col.key)}
+        >
           {col.header}
-        </ExplorerCell>
+        </ExplorerHeaderCell>
       ))}
     </div>
   );

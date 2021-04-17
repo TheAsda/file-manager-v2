@@ -1,4 +1,4 @@
-import React, { MutableRefObject, useEffect, useState } from 'react';
+import React, { MutableRefObject, useEffect, useMemo, useState } from 'react';
 import { useMeasure } from 'react-use';
 import { useHotkeys } from 'react-hotkeys-hook';
 import { useColumns } from './useColumns';
@@ -21,7 +21,7 @@ export interface ExplorerProps {
 
 export const Explorer = (props: ExplorerProps) => {
   const [ref, { width }] = useMeasure<HTMLDivElement>();
-  const columns = useColumns();
+  const { columns, sortKey, sortDirection, toggleSort } = useColumns();
 
   const [columnsSizes, setColumnsSizes] = useState(
     Array.from(Array(columns.length), () => width / columns.length)
@@ -66,15 +66,37 @@ export const Explorer = (props: ExplorerProps) => {
     [props.onEditComplete, inputValue]
   );
 
+  const sortedData = useMemo(() => {
+    const data = props.data.sort((a, b) => {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      if (a[sortKey]! < b[sortKey]!) {
+        return -1;
+      }
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      if (a[sortKey]! > b[sortKey]!) {
+        return 1;
+      }
+      return 0;
+    });
+    if (sortDirection === 'desc') {
+      return data.reverse();
+    }
+    return data;
+  }, [props.data, sortDirection, sortKey]);
+
   return (
     <div
       className="flex flex-col flex-grow h-full bg-gray-900 text-white p-1"
       ref={ref}
     >
-      <ExplorerHeader columns={columns} sizes={columnsSizes} />
+      <ExplorerHeader
+        columns={columns}
+        sizes={columnsSizes}
+        onSort={toggleSort}
+      />
       <div className="flex-grow bg-gray-900 explorer-content overflow-y-overlay">
         <div className="w-full">
-          {props.data.map((item, i) => {
+          {sortedData.map((item, i) => {
             const isSelected = props.selected.includes(i);
             const isLastSelected = i === props.lastSelected;
             if (i === props.editable) {

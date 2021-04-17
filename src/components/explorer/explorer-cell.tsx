@@ -1,15 +1,21 @@
-import React, { PropsWithChildren } from 'react';
+import React, { PropsWithChildren, HTMLAttributes } from 'react';
 import cx from 'classnames';
 
-export interface ExplorerCellProps extends PropsWithChildren<unknown> {
+export interface ExplorerCellProps
+  extends PropsWithChildren<HTMLAttributes<HTMLDivElement>> {
   className?: string;
 }
 
-export const ExplorerCell = ({ children, className }: ExplorerCellProps) => {
+export const ExplorerCell = ({
+  children,
+  className,
+  ...props
+}: ExplorerCellProps) => {
   return (
     <div
+      {...props}
       className={cx(
-        'overflow-hidden whitespace-nowrap overflow-ellipsis',
+        'overflow-hidden whitespace-nowrap overflow-ellipsis flex justify-between items-center',
         className
       )}
     >
