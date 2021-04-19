@@ -10,6 +10,7 @@ export type Shortcut =
   | 'selectMultiplePrev'
   | 'delete'
   | 'deletePermanently'
-  | 'move';
+  | 'move'
+  | 'openGotoPalette';
 
 export type Shortcuts = Record<Shortcut, string | string[]>;

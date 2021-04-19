@@ -10,10 +10,10 @@ import React, {
 import { Command } from '../types/command';
 
 type CommandsStorage = Record<string, Command[]>;
-const CommandsContext = createContext<CommandsStorage>({});
-const CommandsDispatchContext = createContext<Dispatch<CommandsActions>>(
-  () => null
-);
+const CommandsContext = createContext<CommandsStorage | undefined>(undefined);
+const CommandsDispatchContext = createContext<
+  Dispatch<CommandsActions> | undefined
+>(undefined);
 
 type CommandsActions =
   | {

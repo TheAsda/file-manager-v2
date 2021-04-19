@@ -45,6 +45,10 @@ export const usePanels = () => {
     currentPanelRef.current?.updateDirectory?.();
   };
 
+  const openDirectoryInCurrent = (path: string) => {
+    currentPanelRef.current?.setPath(path);
+  };
+
   useHotkeys(switchPanel, togglePanel, {
     enabled: !inputModalIsOpen && !confirmDialogIsOpen,
   });
@@ -159,5 +163,6 @@ export const usePanels = () => {
     onRename,
     updateCurrentDirectory,
     setFocusedPanel,
+    openDirectoryInCurrent,
   };
 };

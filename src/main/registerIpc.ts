@@ -1,6 +1,6 @@
 import { ipcMain } from 'electron-better-ipc';
 import { error } from 'electron-log';
-import { readdir, createFile, mkdirp, rename } from 'fs-extra';
+import { readdir, createFile, mkdirp, rename, pathExists } from 'fs-extra';
 import { join } from 'path';
 import trash from 'trash';
 import { FileInfoSerializable } from '../types/file-info';
@@ -95,4 +95,20 @@ export function registerIpc() {
       throw new Error('Cannot trash path');
     }
   });
+
+  ipcMain.answerRenderer(
+    'exists',
+    async (path: string): Promise<boolean> => {
+      if (!path) {
+        throw new Error('Path is not specified');
+      }
+
+      try {
+        return await pathExists(path);
+      } catch (err) {
+        error(err);
+        throw new Error('Cannot check if path exists');
+      }
+    }
+  );
 }

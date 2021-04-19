@@ -9,6 +9,7 @@ export const useKeyMap = (): Record<Shortcut, string> => {
         up: 'up',
         down: 'down',
         openCommandPalette: ['ctrl+shift+p', 'f1'],
+        openGotoPalette: 'ctrl+p',
         back: 'backspace',
         activate: 'enter',
         switchPanel: 'tab',

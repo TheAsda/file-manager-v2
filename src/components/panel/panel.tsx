@@ -15,12 +15,14 @@ import { Explorer } from '../explorer/explorer';
 import { PathLine } from '../path-line/path-line';
 import { FileInfo } from '../../types/file-info';
 import { useMultipleSelected } from '../../hooks/useMultipleSelected';
+import { useRecentDispatch } from '../../hooks/useRecent';
 
 export interface PanelRef {
   path: string;
   currentItems: FileInfo[];
   currentElement?: HTMLElement;
   updateDirectory: () => void;
+  setPath: (newPath: string) => void;
   startRename: () => void;
 }
 
@@ -52,6 +54,11 @@ export const Panel = ({
   } = useKeyMap();
   const [data, updateDirectory] = useDirectory(path);
   const [editable, setEditable] = useState<number | null>(null);
+  const recentDispatch = useRecentDispatch();
+
+  useEffect(() => {
+    recentDispatch({ type: 'add', path });
+  }, [path, recentDispatch]);
 
   const [selected, lastSelected, selectedDispatch] = useMultipleSelected(
     data.length
@@ -111,7 +118,6 @@ export const Panel = ({
     if (!isFocused) {
       onFocus();
     }
-
     selectedDispatch({ type: 'select', index });
   };
 
@@ -128,6 +134,7 @@ export const Panel = ({
         selectedDispatch({ type: 'reset', index: lastSelected });
         setEditable(lastSelected);
       },
+      setPath: (newPath) => pathDispatch({ type: 'set', path: newPath }),
     };
   }
 
@@ -148,10 +155,11 @@ export const Panel = ({
           selected={isFocused ? selected : []}
           lastSelected={lastSelected}
           onSelect={onSelect}
-          onActivate={(index) =>
-            data[index].isDirectory &&
-            pathDispatch({ type: 'enter', name: data[index].name })
-          }
+          onActivate={(index) => {
+            if (data[index].isDirectory) {
+              pathDispatch({ type: 'enter', name: data[index].name });
+            }
+          }}
           editable={editable}
           currentElementRef={currentElementRef}
           onEditCancel={() => setEditable(null)}

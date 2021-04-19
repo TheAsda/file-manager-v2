@@ -23,3 +23,7 @@ export const rename = async (
 export const trash = async (path: string) => {
   await ipcRenderer.callMain('trash', path);
 };
+
+export const exists = async (path: string): Promise<boolean> => {
+  return ipcRenderer.callMain('exists', path);
+};
