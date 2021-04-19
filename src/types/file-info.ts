@@ -1,5 +1,10 @@
 import { Dayjs } from 'dayjs';
 
+export interface DirectoryInfo {
+  folders: FileInfo[];
+  files: FileInfo[];
+}
+
 export interface FileInfo {
   /** The full path to this directory item. */
   path: string;

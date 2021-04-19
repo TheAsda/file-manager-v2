@@ -2,7 +2,7 @@ import React, { MutableRefObject, useEffect, useMemo, useState } from 'react';
 import { useMeasure } from 'react-use';
 import { useHotkeys } from 'react-hotkeys-hook';
 import { useColumns } from './useColumns';
-import { FileInfo } from '../../types/file-info';
+import { DirectoryInfo, FileInfo } from '../../types/file-info';
 import { ExplorerRow } from './explorer-row';
 import { ExplorerHeader } from './explorer-header';
 import { ExplorerInputRow } from './explorer-input-row';
@@ -67,6 +67,10 @@ export const Explorer = (props: ExplorerProps) => {
   );
 
   const sortedData = useMemo(() => {
+    const directoryInfo: DirectoryInfo = {
+      files: [],
+      folders: [],
+    };
     const data = props.data.sort((a, b) => {
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       if (a[sortKey]! < b[sortKey]!) {
@@ -79,9 +83,16 @@ export const Explorer = (props: ExplorerProps) => {
       return 0;
     });
     if (sortDirection === 'desc') {
-      return data.reverse();
+      data.reverse();
     }
-    return data;
+    data.forEach((item) => {
+      if (item.isDirectory) {
+        directoryInfo.folders.push(item);
+      } else {
+        directoryInfo.files.push(item);
+      }
+    });
+    return [...directoryInfo.folders, ...directoryInfo.files];
   }, [props.data, sortDirection, sortKey]);
 
   return (
